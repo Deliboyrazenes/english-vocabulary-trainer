@@ -1,0 +1,25 @@
+# --- Global ---
+.DS_Store
+Thumbs.db
+
+# --- VS Code ---
+.vscode/
+
+# --- Node / React (frontend) ---
+frontend/node_modules/
+frontend/.env
+frontend/build/
+frontend/dist/
+frontend/.next/
+
+# --- Java / Spring Boot (backend) ---
+backend/target/
+backend/.idea/
+backend/.settings/
+backend/.classpath
+backend/.project
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# --- Logs / temp ---
+*.log
+*.tmp
