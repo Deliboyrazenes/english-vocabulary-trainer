@@ -10,7 +10,7 @@ import QuizSetupModal from "../components/Quiz/QuizSetupModal";
 
 import { FixedSizeGrid as Grid } from "react-window";
 
-const API_BASE = "http://localhost:8080";
+const API_BASE = process.env.REACT_APP_API_BASE;
 
 const normalizeType = (t) => {
   if (!t) return "";
