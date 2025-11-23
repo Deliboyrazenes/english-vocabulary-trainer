@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-
-const API_BASE = process.env.REACT_APP_API_BASE;
+import api from "../services/axios";
 
 /* ======================= WEEKLY CHART COMPONENT ======================= */
 
@@ -70,39 +68,39 @@ export default function ProfilePage({ user, onBack, onLogout }) {
     newPassword: "",
   });
 
-  /* =========== ŞİFRE DOĞRULAMALI HESAP SİLME MODAL STATE =========== */
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deleteError, setDeleteError] = useState("");
 
-  /* =========== BACKEND İSTATİSTİKLERİ YÜKLE =========== */
+  /* =========== BACKEND İSTATİSTİKLERİ TOKEN İLE YÜKLE =========== */
   useEffect(() => {
-    axios
-      .get(`${API_BASE}/known-words/stats?userId=${user.id}`)
+    api
+      .get("/known-words/stats") // Asla userId göndermiyoruz
       .then((res) => setStats(res.data))
       .catch((err) => console.error(err));
-  }, [user.id]);
+  }, []);
 
   /* =========== PROFİL GÜNCELLE =========== */
   const handleUpdateProfile = async () => {
     try {
-      const res = await axios.put(`${API_BASE}/users/update-profile`, {
-        userId: user.id,
-        name: newName,
+      await api.put("/users/update-profile", {
+        name: newName, // userId yok → backend token’dan bulacak
       });
 
-      localStorage.setItem("user", JSON.stringify(res.data));
+      const updated = { ...user, name: newName };
+      localStorage.setItem("user", JSON.stringify(updated));
+
       alert("Profil güncellendi ✔");
     } catch (err) {
-      alert("Hata: " + err.response?.data);
+      alert("Hata: " + (err.response?.data || "Sunucu hatası"));
     }
   };
 
   /* =========== ŞİFRE GÜNCELLE =========== */
   const handlePasswordChange = async () => {
     try {
-      await axios.put(`${API_BASE}/users/change-password`, {
-        userId: user.id,
+      await api.put("/users/change-password", {
         oldPassword: passwordData.oldPassword,
         newPassword: passwordData.newPassword,
       });
@@ -114,38 +112,26 @@ export default function ProfilePage({ user, onBack, onLogout }) {
     }
   };
 
-  /* =========== HESAP SİLME (ŞİFRE DOĞRULAMA) =========== */
+  /* =========== HESAP SİL =========== */
   const handleConfirmDelete = async () => {
     if (!deletePassword) {
-      // Animasyonu resetle
-      setDeleteError("");
-      setTimeout(() => setDeleteError("Lütfen şifrenizi girin."), 10);
+      setDeleteError("Lütfen şifrenizi girin.");
       return;
     }
 
     try {
-      await axios.delete(`${API_BASE}/users/delete`, {
-        data: {
-          userId: user.id,
-          password: deletePassword,
-        },
+      await api.delete("/users/delete", {
+        data: { password: deletePassword },
       });
 
       onLogout();
     } catch (err) {
-      // shake animasyonunu tetiklemek için reset + tekrar set
-      setDeleteError("");
-
-      setTimeout(() => {
-        const raw = err.response?.data;
-        setDeleteError(
-          typeof raw === "string" ? raw : raw?.message || "Hatalı şifre."
-        );
-      }, 10);
+      const raw = err.response?.data;
+      setDeleteError(
+        typeof raw === "string" ? raw : raw?.message || "Hatalı şifre."
+      );
     }
   };
-
-  const [deleteConfirmText, setDeleteConfirmText] = useState("");
 
   return (
     <div className="min-h-screen w-full p-8 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white overflow-auto">
@@ -170,7 +156,7 @@ export default function ProfilePage({ user, onBack, onLogout }) {
 
       {/* ANA GRID */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-10">
-        {/* SOL TARAF — Profil Ayarları */}
+        {/* SOL TARAF */}
         <div className="space-y-8">
           {/* PROFİL BİLGİLERİ */}
           <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 border border-white/20 shadow-xl">
@@ -181,7 +167,6 @@ export default function ProfilePage({ user, onBack, onLogout }) {
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               className="w-full px-4 py-3 rounded-xl mt-1 text-black"
-              placeholder="Adınızı girin..."
             />
 
             <button
@@ -207,7 +192,6 @@ export default function ProfilePage({ user, onBack, onLogout }) {
                 })
               }
               className="w-full px-4 py-3 rounded-xl mt-1 text-black"
-              placeholder="••••••••"
             />
 
             <label className="text-sm text-white/70 mt-4 block">
@@ -223,7 +207,6 @@ export default function ProfilePage({ user, onBack, onLogout }) {
                 })
               }
               className="w-full px-4 py-3 rounded-xl mt-1 text-black"
-              placeholder="••••••••"
             />
 
             <button
@@ -249,9 +232,8 @@ export default function ProfilePage({ user, onBack, onLogout }) {
           </div>
         </div>
 
-        {/* SAĞ TARAF — İstatistikler */}
+        {/* SAĞ TARAF — İSTATİSTİKLER */}
         <div className="xl:col-span-2 space-y-8">
-          {/* SON İSTATİSTİKLER */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <StatCard label="Bugün Öğrendim" value={stats.today} icon="🔥" />
             <StatCard label="Son 7 Gün" value={stats.last7} icon="📊" />
@@ -292,22 +274,19 @@ export default function ProfilePage({ user, onBack, onLogout }) {
           {/* HAFTALIK AKTİVİTE */}
           <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 border border-white/20 shadow-xl">
             <h2 className="text-xl font-bold mb-4">🔥 Haftalık Aktivite</h2>
-
             <WeeklyChart data={stats.weeklyActivity} />
           </div>
         </div>
       </div>
 
-      {/* ================= DELETE ACCOUNT MODAL ================= */}
+      {/* DELETE ACCOUNT MODAL */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
           <div
-            className={`bg-white w-full max-w-md p-8 rounded-2xl shadow-2xl text-gray-800 relative 
-    animate-[fadeIn_0.25s_ease]
-    ${deleteError ? "animate-shake" : ""}
-  `}
+            className={`bg-white w-full max-w-md p-8 rounded-2xl shadow-2xl text-gray-800 relative ${
+              deleteError ? "animate-shake" : ""
+            }`}
           >
-            {/* Kapatma */}
             <button
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-xl"
               onClick={() => {
@@ -322,50 +301,40 @@ export default function ProfilePage({ user, onBack, onLogout }) {
 
             <h2 className="text-2xl font-bold mb-4 text-red-600">Hesabı Sil</h2>
 
-            <p className="text-gray-700 mb-4 leading-relaxed">
-              Hesabınızı kalıcı olarak silmek üzeresiniz. Bu işlem tüm
-              verilerinizi geri dönülmez şekilde silecektir.
+            <p className="text-gray-700 mb-4">
+              Bu işlem kalıcıdır. Tüm verileriniz silinecek.
             </p>
 
-            {/* Şifre */}
             <label className="text-sm font-semibold text-gray-700">Şifre</label>
             <input
               type="password"
-              placeholder="Şifrenizi girin..."
               value={deletePassword}
               onChange={(e) => setDeletePassword(e.target.value)}
-              className="w-full px-4 py-3 mb-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-red-400 outline-none"
+              className="w-full px-4 py-3 mb-4 rounded-xl border border-gray-300"
             />
 
-            {/* HESABIMI SİL doğrulaması */}
             <label className="text-sm font-semibold text-gray-700">
-              Onay metnini yazın:{" "}
-              <span className="font-bold">HESABIMI SİL</span>
+              Onay metnini yazın: <b>HESABIMI SİL</b>
             </label>
-
             <input
               type="text"
-              placeholder="HESABIMI SİL"
               value={deleteConfirmText}
               onChange={(e) => setDeleteConfirmText(e.target.value)}
-              className="w-full px-4 py-3 mb-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-red-400 outline-none uppercase"
+              className="w-full px-4 py-3 mb-4 rounded-xl border border-gray-300 uppercase"
             />
 
-            {/* Hata */}
             {deleteError && (
               <p className="text-red-600 text-sm mb-3">{deleteError}</p>
             )}
 
-            {/* Silme butonu */}
             <button
               onClick={handleConfirmDelete}
               disabled={deleteConfirmText !== "HESABIMI SİL"}
-              className={`w-full py-3 mt-2 rounded-xl font-semibold shadow-lg text-white transition-all
-          ${
-            deleteConfirmText === "HESABIMI SİL"
-              ? "bg-red-600 hover:bg-red-700"
-              : "bg-red-400 cursor-not-allowed"
-          }`}
+              className={`w-full py-3 rounded-xl font-semibold shadow-lg text-white ${
+                deleteConfirmText === "HESABIMI SİL"
+                  ? "bg-red-600 hover:bg-red-700"
+                  : "bg-red-400 cursor-not-allowed"
+              }`}
             >
               Hesabı Kalıcı Olarak Sil ❌
             </button>

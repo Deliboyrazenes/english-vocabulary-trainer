@@ -5,45 +5,57 @@ import ProfilePage from "./pages/ProfilePage";
 import QuizPage from "./pages/QuizPage";
 
 function App() {
+
+  // USER STATE
   const [user, setUser] = useState(() => {
     const stored = localStorage.getItem("user");
-    const remember = localStorage.getItem("rememberUser");
-
-    if (remember) {
-      return stored ? JSON.parse(stored) : null;
-    } else {
-      return null;
-    }
+    return stored ? JSON.parse(stored) : null;
   });
 
-  // "words" | "profile" | "quiz"
-  const [screen, setScreen] = useState("words");
+  // SCREEN STATE (F5 sonrası aynı sayfada kalmak için)
+  const [screen, setScreen] = useState(() => {
+    return localStorage.getItem("screen") || "words";
+  });
 
-  // Login başarılı
+  // ---------------- LOGIN ----------------
   const handleLoginSuccess = (u) => {
     setUser(u);
+    localStorage.setItem("user", JSON.stringify(u));
+
     setScreen("words");
+    localStorage.setItem("screen", "words");
+
+    localStorage.setItem("token", u.token);
   };
 
-  // Logout işlemi
+  // ---------------- LOGOUT ----------------
   const handleLogout = () => {
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("screen");
+
     setUser(null);
     setScreen("words");
   };
 
-  // Profil ekranına git
-  const goToProfile = () => setScreen("profile");
+  // ---------------- SCREEN SWITCHES ----------------
+  const goToProfile = () => {
+    setScreen("profile");
+    localStorage.setItem("screen", "profile");
+  };
 
-  // Kelime ekranına dön
-  const goToWords = () => setScreen("words");
+  const goToWords = () => {
+    setScreen("words");
+    localStorage.setItem("screen", "words");
+  };
 
-  // Quiz ekranına geçiş
   const goToQuiz = (settings, words) => {
     window.quizData = { settings, words };
     setScreen("quiz");
+    localStorage.setItem("screen", "quiz");
   };
 
+  // ---------------- RENDER ----------------
   return (
     <>
       {!user ? (

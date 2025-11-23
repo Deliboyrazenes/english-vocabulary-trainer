@@ -47,12 +47,13 @@ export default function WordCard({
     adv: "🚀",
   };
 
-  const gradientClass = {
-    noun: "from-blue-500 to-indigo-600",
-    verb: "from-purple-500 to-pink-600",
-    adj: "from-green-500 to-teal-600",
-    adv: "from-orange-500 to-red-600",
-  }[typeKey] || "from-gray-400 to-gray-600";
+  const gradientClass =
+    {
+      noun: "from-blue-500 to-indigo-600",
+      verb: "from-purple-500 to-pink-600",
+      adj: "from-green-500 to-teal-600",
+      adv: "from-orange-500 to-red-600",
+    }[typeKey] || "from-gray-400 to-gray-600";
 
   const speak = () => {
     const u = new SpeechSynthesisUtterance(word.en);
@@ -88,7 +89,9 @@ export default function WordCard({
           className="absolute inset-0 bg-white rounded-2xl shadow-xl flex flex-col justify-between p-5"
           style={{ backfaceVisibility: "hidden" }}
         >
-          <div className={`h-1.5 bg-gradient-to-r ${gradientClass} rounded-full`} />
+          <div
+            className={`h-1.5 bg-gradient-to-r ${gradientClass} rounded-full`}
+          />
 
           <h2 className="text-2xl font-bold text-center mt-3 text-gray-800">
             {frontText}
@@ -114,7 +117,9 @@ export default function WordCard({
             transform: "rotateY(180deg)",
           }}
         >
-          <div className={`h-1.5 bg-gradient-to-r ${gradientClass} rounded-full`} />
+          <div
+            className={`h-1.5 bg-gradient-to-r ${gradientClass} rounded-full`}
+          />
 
           <p className="text-xl text-center mt-3 text-gray-700">{backText}</p>
 
@@ -151,7 +156,9 @@ export default function WordCard({
           onOpenNoteModal(word);
         }}
         className={`absolute top-2 right-2 text-sm px-2 py-1 rounded-lg shadow 
-          ${note ? "bg-yellow-300 text-yellow-900" : "bg-gray-200 text-gray-600"}`}
+          ${
+            note ? "bg-yellow-300 text-yellow-900" : "bg-gray-200 text-gray-600"
+          }`}
       >
         📝
       </button>

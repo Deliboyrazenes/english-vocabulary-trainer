@@ -1,6 +1,5 @@
-// src/pages/WordListPage.jsx
 import React, { useEffect, useState, useMemo } from "react";
-import axios from "axios";
+import api from "../services/axios";
 
 import FilterBar from "../components/FilterBar/FilterBar";
 import StatsBar from "../components/StatsBar/StatsBar";
@@ -9,8 +8,6 @@ import GlobalNoteModal from "../components/NoteModal/GlobalNoteModal";
 import QuizSetupModal from "../components/Quiz/QuizSetupModal";
 
 import { FixedSizeGrid as Grid } from "react-window";
-
-const API_BASE = process.env.REACT_APP_API_BASE;
 
 const normalizeType = (t) => {
   if (!t) return "";
@@ -54,13 +51,9 @@ export default function WordListPage({
     const load = async () => {
       try {
         const [wordsRes, knownRes, notesRes] = await Promise.all([
-          axios.get(`${API_BASE}/words`),
-          axios.get(`${API_BASE}/known-words`, {
-            params: { userId: user.id },
-          }),
-          axios.get(`${API_BASE}/notes/by-user`, {
-            params: { userId: user.id },
-          }),
+          api.get("/words"),
+          api.get("/known-words"), // userId kaldırıldı
+          api.get("/notes/by-user"), // userId kaldırıldı
         ]);
 
         setWords(wordsRes.data);
@@ -72,19 +65,19 @@ export default function WordListPage({
         });
         setNotes(map);
       } catch (err) {
+        console.error(err);
         setError("Backend bağlantı hatası");
       } finally {
         setLoading(false);
       }
     };
     load();
-  }, [user.id]);
+  }, []); // userId artık gerekmedi
 
   /* ------------------ MARK KNOWN / UNMARK ------------------ */
   const markAsKnown = async (id) => {
     try {
-      await axios.post(`${API_BASE}/known-words`, {
-        userId: user.id,
+      await api.post("/known-words", {
         wordId: id,
       });
       setKnownWordIds((p) => [...p, id]);
@@ -95,8 +88,8 @@ export default function WordListPage({
 
   const unmarkKnown = async (id) => {
     try {
-      await axios.delete(`${API_BASE}/known-words`, {
-        params: { userId: user.id, wordId: id },
+      await api.delete("/known-words", {
+        params: { wordId: id },
       });
       setKnownWordIds((p) => p.filter((x) => x !== id));
     } catch {
@@ -107,8 +100,7 @@ export default function WordListPage({
   /* ------------------------ SAVE / DELETE NOTE ------------------------ */
   const handleSaveNote = async (id, text) => {
     try {
-      await axios.post(`${API_BASE}/notes/save`, {
-        userId: user.id,
+      await api.post("/notes/save", {
         wordId: id,
         text,
       });
@@ -121,8 +113,8 @@ export default function WordListPage({
 
   const handleDeleteNote = async (id) => {
     try {
-      await axios.delete(`${API_BASE}/notes`, {
-        params: { userId: user.id, wordId: id },
+      await api.delete("/notes", {
+        params: { wordId: id },
       });
 
       setNotes((p) => {
@@ -138,8 +130,7 @@ export default function WordListPage({
   /* ------------------------ FILTERED WORDS ------------------------ */
   const filteredWords = useMemo(() => {
     let result = words.filter((w) => {
-      const matchLevel =
-        filters.level === "all" || w.level === filters.level;
+      const matchLevel = filters.level === "all" || w.level === filters.level;
 
       const matchType =
         filters.type === "all" || normalizeType(w.type) === filters.type;
@@ -163,7 +154,7 @@ export default function WordListPage({
     return result;
   }, [words, filters, knownWordIds, showKnown, shuffled]);
 
-  /* ------------------------ QUIZ START (WORD SOURCE) ------------------------ */
+  /* ------------------------ QUIZ START ------------------------ */
   const handleStartQuizFromModal = (settings) => {
     setShowQuizSetup(false);
 
@@ -178,7 +169,6 @@ export default function WordListPage({
     }
 
     quizWords = quizWords.sort(() => Math.random() - 0.5);
-
     quizWords = quizWords.slice(0, settings.questionCount);
 
     onStartQuiz(settings, quizWords);
@@ -222,11 +212,8 @@ export default function WordListPage({
   /* ------------------------ RENDER ------------------------ */
   return (
     <div className="min-h-screen p-4 md:p-6 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 overflow-auto text-white">
-      
-      {/* Max Width Container */}
       <div className="max-w-[1800px] mx-auto">
-
-        {/* Header */}
+        {/* HEADER */}
         <div className="bg-white/10 p-4 md:p-5 rounded-3xl mb-6 border border-white/20 shadow-xl backdrop-blur-md flex flex-col md:flex-row justify-between items-center gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold">Hoş geldin 👋</h1>
@@ -249,7 +236,7 @@ export default function WordListPage({
           </div>
         </div>
 
-        {/* Filter */}
+        {/* FILTER */}
         <FilterBar
           level={filters.level}
           type={filters.type}
@@ -257,7 +244,7 @@ export default function WordListPage({
           onFilterChange={(k, v) => setFilters((p) => ({ ...p, [k]: v }))}
         />
 
-        {/* Stats */}
+        {/* STATS */}
         <StatsBar
           total={words.length}
           a1={words.filter((w) => w.level === "A1").length}
@@ -270,7 +257,6 @@ export default function WordListPage({
 
         {/* Controls Section */}
         <div className="flex justify-center mb-8 gap-3 md:gap-4 flex-wrap px-4">
-
           {/* Tabs */}
           <div className="bg-white/10 backdrop-blur-md p-2 rounded-2xl inline-flex border border-white/20 shadow-xl">
             <button
@@ -379,7 +365,6 @@ export default function WordListPage({
             </Grid>
           </div>
         </div>
-
       </div>
 
       {/* QUIZ MODAL */}

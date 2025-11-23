@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-
-const API_BASE = process.env.REACT_APP_API_BASE;
+import api from "../services/axios";
 
 export default function AuthPage({ onLoginSuccess }) {
   const [email, setEmail] = useState("");
@@ -10,15 +8,11 @@ export default function AuthPage({ onLoginSuccess }) {
   const [isRegister, setIsRegister] = useState(false);
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
-  // Remember me
   const [remember, setRemember] = useState(false);
-
-  // Email autocomplete list
   const [savedEmails, setSavedEmails] = useState([]);
   const [showEmailList, setShowEmailList] = useState(false);
 
-  // İlk açılışta remember me bilgisi yüklenir (Sadece Login için)
+  /* ------------------------ LOAD REMEMBER ENTRIES ------------------------ */
   useEffect(() => {
     const saved = localStorage.getItem("rememberUser");
     if (saved) {
@@ -32,12 +26,11 @@ export default function AuthPage({ onLoginSuccess }) {
     setSavedEmails(emails);
   }, []);
 
-  // Register’e geçince otomatik doldurmayı SIFIRLA
+  /* ------------------------ SWITCH LOGIN / REGISTER ------------------------ */
   const switchMode = () => {
     setIsRegister(!isRegister);
     setMessage("");
 
-    // Register moduna geçiliyorsa inputları temizle
     if (!isRegister) {
       setEmail("");
       setPassword("");
@@ -46,7 +39,7 @@ export default function AuthPage({ onLoginSuccess }) {
     }
   };
 
-  // Email seçildiğinde liste kapanır
+  /* ------------------------ EMAIL LIST ------------------------ */
   const handleSelectEmail = (selected) => {
     setEmail(selected);
     setShowEmailList(false);
@@ -63,14 +56,15 @@ export default function AuthPage({ onLoginSuccess }) {
     }
   };
 
+  /* ------------------------ SUBMIT ------------------------ */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
 
     try {
       if (isRegister) {
-        // REGISTER
-        const res = await axios.post(`${API_BASE}/users/register`, {
+        /* REGISTER */
+        const res = await api.post("/users/register", {
           email,
           password,
           name,
@@ -84,14 +78,14 @@ export default function AuthPage({ onLoginSuccess }) {
           setName("");
         }
       } else {
-        // LOGIN
-        const res = await axios.post(`${API_BASE}/users/login`, {
+        /* LOGIN */
+        const res = await api.post("/users/login", {
           email,
           password,
         });
 
-        if (res.data.id) {
-          // Remember me sadece LOGIN için geçerli
+        if (res.data.token) {
+          /* REMEMBER ME */
           if (remember) {
             localStorage.setItem(
               "rememberUser",
@@ -101,26 +95,45 @@ export default function AuthPage({ onLoginSuccess }) {
             localStorage.removeItem("rememberUser");
           }
 
-          // email autocomplete kayıt
           saveEmailToLocalStorage(email);
 
-          localStorage.setItem("user", JSON.stringify(res.data));
-          onLoginSuccess(res.data);
+          /* JWT TOKEN ve USER OBJESİ */
+          const userObj = {
+            token: res.data.token,
+            userId: res.data.userId,
+            email: res.data.email,
+            name: res.data.name,
+          };
+
+          localStorage.setItem("token", res.data.token);
+          localStorage.setItem("user", JSON.stringify(userObj));
+
+          /* APP STATE’E GÖNDER */
+          onLoginSuccess(userObj);
         } else {
           setMessage("❌ Email veya şifre hatalı.");
         }
       }
     } catch (err) {
-      console.error(err);
-      setMessage("🚨 Sunucuya bağlanılamadı.");
+      console.error("Auth error:", err);
+
+      if (err.response?.status === 401) {
+        setMessage("❌ Email veya şifre hatalı.");
+      } else if (err.response?.status === 403) {
+        setMessage("❌ Erişim engellendi. Lütfen tekrar deneyin.");
+      } else {
+        setMessage(
+          "🚨 Sunucuya ulaşılamadı: " +
+            (err.response?.data?.error || err.message)
+        );
+      }
     }
   };
 
+  /* ------------------------ UI ------------------------ */
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 p-6">
-      {/* Ana Kart */}
       <div className="w-full max-w-xl bg-white rounded-3xl shadow-2xl p-12">
-        {/* Header */}
         <div className="flex flex-col items-center mb-10">
           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg mb-4">
             <span className="text-4xl">📚</span>
@@ -136,9 +149,8 @@ export default function AuthPage({ onLoginSuccess }) {
           </p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* E-mail Input + Autocomplete */}
+          {/* EMAIL INPUT */}
           <div className="relative">
             <label className="block text-sm font-semibold text-gray-600 mb-2">
               Email Address
@@ -152,11 +164,9 @@ export default function AuthPage({ onLoginSuccess }) {
               onFocus={() => !isRegister && setShowEmailList(true)}
               onBlur={() => setTimeout(() => setShowEmailList(false), 120)}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 
-                         focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all duration-200"
+              className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all duration-200"
             />
 
-            {/* Dropdown */}
             {showEmailList && savedEmails.length > 0 && !isRegister && (
               <div className="absolute top-full mt-2 w-full bg-white shadow-lg border border-gray-200 rounded-xl overflow-hidden z-40">
                 {savedEmails.map((mail, i) => (
@@ -172,7 +182,7 @@ export default function AuthPage({ onLoginSuccess }) {
             )}
           </div>
 
-          {/* Name - Register Mode */}
+          {/* REGISTER MODE FULL NAME */}
           {isRegister && (
             <div>
               <label className="block text-sm font-semibold text-gray-600 mb-2">
@@ -183,13 +193,12 @@ export default function AuthPage({ onLoginSuccess }) {
                 value={name}
                 placeholder="John Doe"
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 
-                           focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all duration-200"
+                className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all duration-200"
               />
             </div>
           )}
 
-          {/* Password */}
+          {/* PASSWORD */}
           <div>
             <label className="block text-sm font-semibold text-gray-600 mb-2">
               Password
@@ -202,8 +211,7 @@ export default function AuthPage({ onLoginSuccess }) {
                 required
                 placeholder="••••••••"
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 pr-12 rounded-xl bg-gray-50 border border-gray-200 
-                           focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all duration-200"
+                className="w-full px-4 py-3 pr-12 rounded-xl bg-gray-50 border border-gray-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all duration-200"
               />
 
               <button
@@ -216,7 +224,7 @@ export default function AuthPage({ onLoginSuccess }) {
             </div>
           </div>
 
-          {/* Remember Me (Sadece Login modunda mantıklı çalışır) */}
+          {/* REMEMBER ME */}
           {!isRegister && (
             <div className="flex items-center gap-2">
               <input
@@ -232,26 +240,22 @@ export default function AuthPage({ onLoginSuccess }) {
             </div>
           )}
 
-          {/* Submit Button */}
+          {/* SUBMIT BUTTON */}
           <button
             type="submit"
-            className="w-full py-3.5 rounded-xl font-semibold text-white text-lg shadow-md 
-                       bg-gradient-to-r from-indigo-600 to-purple-600 
-                       hover:from-indigo-700 hover:to-purple-700
-                       transition-all duration-200 hover:scale-[1.02]"
+            className="w-full py-3.5 rounded-xl font-semibold text-white text-lg shadow-md bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 hover:scale-[1.02]"
           >
             {isRegister ? "Create Account" : "Login"}
           </button>
         </form>
 
-        {/* Divider */}
+        {/* FOOTER + SWITCH MODE */}
         <div className="flex items-center my-8">
           <div className="flex-1 border-t border-gray-300"></div>
           <span className="px-4 text-gray-500">or</span>
           <div className="flex-1 border-t border-gray-300"></div>
         </div>
 
-        {/* Toggle */}
         <p className="text-center text-gray-700">
           {isRegister ? (
             <>
@@ -276,7 +280,7 @@ export default function AuthPage({ onLoginSuccess }) {
           )}
         </p>
 
-        {/* Message */}
+        {/* MESSAGE */}
         {message && (
           <div
             className={`mt-6 text-center p-4 rounded-xl font-medium ${
