@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../services/axios";
+import SkeletonAuth from "../components/Skeleton/SkeletonAuth";
 
 export default function AuthPage({ onLoginSuccess }) {
   const [email, setEmail] = useState("");
@@ -12,8 +13,14 @@ export default function AuthPage({ onLoginSuccess }) {
   const [savedEmails, setSavedEmails] = useState([]);
   const [showEmailList, setShowEmailList] = useState(false);
 
+  // 👇 Eklenen loading state
+  const [loadingScreen, setLoadingScreen] = useState(true);
+
   /* ------------------------ LOAD REMEMBER ENTRIES ------------------------ */
   useEffect(() => {
+    // 0.5 sn premium skeleton süre
+    const t = setTimeout(() => setLoadingScreen(false), 200);
+
     const saved = localStorage.getItem("rememberUser");
     if (saved) {
       const parsed = JSON.parse(saved);
@@ -24,7 +31,12 @@ export default function AuthPage({ onLoginSuccess }) {
 
     const emails = JSON.parse(localStorage.getItem("savedEmails") || "[]");
     setSavedEmails(emails);
+
+    return () => clearTimeout(t);
   }, []);
+
+  /* ------------------------ SHOW SKELETON ------------------------ */
+  if (loadingScreen) return <SkeletonAuth />;
 
   /* ------------------------ SWITCH LOGIN / REGISTER ------------------------ */
   const switchMode = () => {
@@ -63,7 +75,6 @@ export default function AuthPage({ onLoginSuccess }) {
 
     try {
       if (isRegister) {
-        /* REGISTER */
         const res = await api.post("/users/register", {
           email,
           password,
@@ -78,14 +89,12 @@ export default function AuthPage({ onLoginSuccess }) {
           setName("");
         }
       } else {
-        /* LOGIN */
         const res = await api.post("/users/login", {
           email,
           password,
         });
 
         if (res.data.token) {
-          /* REMEMBER ME */
           if (remember) {
             localStorage.setItem(
               "rememberUser",
@@ -97,7 +106,6 @@ export default function AuthPage({ onLoginSuccess }) {
 
           saveEmailToLocalStorage(email);
 
-          /* JWT TOKEN ve USER OBJESİ */
           const userObj = {
             token: res.data.token,
             userId: res.data.userId,
@@ -108,7 +116,6 @@ export default function AuthPage({ onLoginSuccess }) {
           localStorage.setItem("token", res.data.token);
           localStorage.setItem("user", JSON.stringify(userObj));
 
-          /* APP STATE’E GÖNDER */
           onLoginSuccess(userObj);
         } else {
           setMessage("❌ Email veya şifre hatalı.");

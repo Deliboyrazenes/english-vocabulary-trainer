@@ -6,6 +6,7 @@ import StatsBar from "../components/StatsBar/StatsBar";
 import WordCard from "../components/WordCard/WordCard";
 import GlobalNoteModal from "../components/NoteModal/GlobalNoteModal";
 import QuizSetupModal from "../components/Quiz/QuizSetupModal";
+import SkeletonWordList from "../components/Skeleton/SkeletonWordList";
 
 import { FixedSizeGrid as Grid } from "react-window";
 
@@ -72,7 +73,7 @@ export default function WordListPage({
       }
     };
     load();
-  }, []); // userId artık gerekmedi
+  }, []);
 
   /* ------------------ MARK KNOWN / UNMARK ------------------ */
   const markAsKnown = async (id) => {
@@ -175,12 +176,7 @@ export default function WordListPage({
   };
 
   /* ------------------------ LOADING / ERROR ------------------------ */
-  if (loading)
-    return (
-      <div className="min-h-screen text-white flex items-center justify-center">
-        Yükleniyor...
-      </div>
-    );
+  if (loading) return <SkeletonWordList />;
 
   if (error)
     return (
@@ -190,9 +186,9 @@ export default function WordListPage({
     );
 
   /* ------------------------ GRID CONFIG ------------------------ */
-  const CARD_WIDTH = 270;
+  const CARD_WIDTH = 280;
   const CARD_HEIGHT = 210;
-  const GAP = 20;
+  const GAP = 25;
   const screenWidth = window.innerWidth;
 
   const COLUMNS =

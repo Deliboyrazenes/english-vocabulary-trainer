@@ -66,8 +66,8 @@ export default function WordCard({
       className="relative cursor-pointer select-none transform transition-all duration-300 hover:scale-105"
       onClick={() => setFlipped((v) => !v)}
       style={{
-        width: "250px",
-        height: "180px",
+        width: "260px",
+        height: "200px",
         perspective: "1000px",
       }}
     >
