@@ -67,11 +67,15 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration c = new CorsConfiguration();
-        c.addAllowedOrigin("https://vocab-frontend-bi8w.onrender.com");
-        c.addAllowedOrigin("http://localhost:3000");
-        c.addAllowedMethod("*");
-        c.addAllowedHeader("*");
+
         c.setAllowCredentials(true);
+
+        c.addAllowedOriginPattern("http://localhost:3000");
+        c.addAllowedOriginPattern("https://vocab-frontend-bi8w.onrender.com");
+
+        c.addAllowedHeader("*");
+        c.addAllowedMethod("*");
+
         c.addExposedHeader("Authorization");
 
         UrlBasedCorsConfigurationSource s = new UrlBasedCorsConfigurationSource();
