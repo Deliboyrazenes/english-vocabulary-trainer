@@ -1,5 +1,7 @@
 package com.vocab.vocabapp.config;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -66,21 +68,21 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration c = new CorsConfiguration();
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
 
-        c.setAllowCredentials(true);
+        corsConfiguration.setAllowedOrigins(List.of(
+                "http://localhost:3000",
+                "https://vocab-frontend-bi8w.onrender.com",
+                "https://backend-wandering-sun-7840.fly.dev"
+        ));
 
-        c.addAllowedOriginPattern("http://localhost:3000");
-        c.addAllowedOriginPattern("https://vocab-frontend-bi8w.onrender.com");
+        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        corsConfiguration.setAllowedHeaders(List.of("*"));
+        corsConfiguration.setAllowCredentials(true);
 
-        c.addAllowedHeader("*");
-        c.addAllowedMethod("*");
-
-        c.addExposedHeader("Authorization");
-
-        UrlBasedCorsConfigurationSource s = new UrlBasedCorsConfigurationSource();
-        s.registerCorsConfiguration("/**", c);
-        return s;
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfiguration);
+        return source;
     }
 
     @Bean
