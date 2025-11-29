@@ -77,22 +77,26 @@ export default function WordListPage({
 
   /* ------------------ MARK KNOWN / UNMARK ------------------ */
   const markAsKnown = async (id) => {
-    try {
-      await api.post("/known-words", {
-        wordId: id,
-      });
+    setTimeout(() => {
       setKnownWordIds((p) => [...p, id]);
+    }, 600);
+
+    try {
+      await api.post("/known-words", { wordId: id });
     } catch {
       alert("Hata oluştu");
     }
   };
 
   const unmarkKnown = async (id) => {
+    setTimeout(() => {
+      setKnownWordIds((p) => p.filter((x) => x !== id));
+    }, 600);
+
     try {
       await api.delete("/known-words", {
         params: { wordId: id },
       });
-      setKnownWordIds((p) => p.filter((x) => x !== id));
     } catch {
       alert("Hata oluştu");
     }

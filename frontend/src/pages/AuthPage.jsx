@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import api from "../services/axios";
 import SkeletonAuth from "../components/Skeleton/SkeletonAuth";
 
-export default function AuthPage({ onLoginSuccess }) {
+export default function AuthPage({ onLoginSuccess, onBackToHome }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -140,7 +140,15 @@ export default function AuthPage({ onLoginSuccess }) {
   /* ------------------------ UI ------------------------ */
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 p-6">
-      <div className="w-full max-w-xl bg-white rounded-3xl shadow-2xl p-12">
+      <div
+        className="absolute top-6 left-6 flex items-center gap-2 cursor-pointer text-white/80 hover:text-white transition"
+        onClick={onBackToHome}
+      >
+        <span className="text-2xl">📚</span>
+        <span className="font-semibold text-lg">VocabZone</span>
+      </div>
+
+      <div className="w-full max-w-xl bg-white rounded-3xl shadow-2xl p-12 relative">
         <div className="flex flex-col items-center mb-10">
           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg mb-4">
             <span className="text-4xl">📚</span>

@@ -24,6 +24,7 @@ export default function WordCard({
   onOpenNoteModal,
 }) {
   const [flipped, setFlipped] = useState(false);
+  const [pressed, setPressed] = useState(false); // 🔥 Buton animasyon state
 
   useEffect(() => {
     if (flipped) {
@@ -127,11 +128,24 @@ export default function WordCard({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              isKnown ? onUnmarkKnown(word.id) : onMarkKnown(word.id);
+
+              if (isKnown) onUnmarkKnown(word.id);
+              else onMarkKnown(word.id);
+
+              setPressed(true);
+              setTimeout(() => setPressed(false), 600);
             }}
-            className={`w-full py-2 rounded-lg text-white font-semibold bg-gradient-to-r ${gradientClass}`}
+            className={`w-full py-2 rounded-lg text-white font-semibold bg-gradient-to-r ${gradientClass} ${
+              pressed ? "bounce-success" : ""
+            }`}
           >
-            {isKnown ? "↩ Geri Al" : "✓ Biliyorum"}
+            {isKnown ? (
+              "↩ Geri Al"
+            ) : (
+              <>
+                <span className="checkmark">✓</span> Biliyorum
+              </>
+            )}
           </button>
         </div>
       </div>
