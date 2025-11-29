@@ -72,8 +72,7 @@ public class SecurityConfig {
 
         corsConfiguration.setAllowedOrigins(List.of(
                 "http://localhost:3000",
-                "https://vocab-frontend-bi8w.onrender.com",
-                "https://backend-wandering-sun-7840.fly.dev"
+                "https://vocabzone.vercel.app"
         ));
 
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
