@@ -214,7 +214,16 @@ export default function WordListPage({
     <div className="min-h-screen p-4 md:p-6 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 overflow-auto text-white">
       <div className="max-w-[1800px] mx-auto">
         {/* HEADER */}
-        <div className="bg-white/10 p-4 md:p-5 rounded-3xl mb-6 border border-white/20 shadow-xl backdrop-blur-md flex flex-col md:flex-row justify-between items-center gap-4">
+        <div
+          className="
+  bg-white/10 p-3 sm:p-4 md:p-5 
+  rounded-3xl mb-4 sm:mb-6 
+  border border-white/20 shadow-xl backdrop-blur-md 
+  flex flex-col sm:flex-row 
+  justify-between sm:items-center 
+  gap-3 sm:gap-4
+"
+        >
           <div>
             <h1 className="text-2xl md:text-3xl font-bold">Hoş geldin 👋</h1>
             <p className="text-white/70 text-sm">{user.name}</p>
@@ -256,7 +265,15 @@ export default function WordListPage({
         />
 
         {/* Controls Section */}
-        <div className="flex justify-center mb-8 gap-3 md:gap-4 flex-wrap px-4">
+        <div
+          className="
+  flex justify-center 
+  mb-6 sm:mb-8 
+  gap-2 sm:gap-3 md:gap-4 
+  flex-wrap 
+  px-2 sm:px-4
+"
+        >
           {/* Tabs */}
           <div className="bg-white/10 backdrop-blur-md p-2 rounded-2xl inline-flex border border-white/20 shadow-xl">
             <button
@@ -330,14 +347,23 @@ export default function WordListPage({
 
         {/* Word Grid - Centered with Better Spacing */}
         <div className="flex justify-center">
-          <div className="bg-white/10 p-6 md:p-8 rounded-3xl border border-white/20 shadow-2xl backdrop-blur-md">
+          <div
+            className="
+  bg-white/10 
+  p-3 sm:p-4 md:p-6 
+  rounded-3xl 
+  border border-white/20 
+  shadow-2xl backdrop-blur-md
+  overflow-hidden
+"
+          >
             <Grid
               columnCount={COLUMNS}
               columnWidth={CARD_WIDTH + GAP}
               height={GRID_HEIGHT}
               rowCount={rowCount}
               rowHeight={CARD_HEIGHT + GAP}
-              width={(CARD_WIDTH + GAP) * COLUMNS}
+              width={Math.min((CARD_WIDTH + GAP) * COLUMNS, screenWidth - 20)}
             >
               {({ columnIndex, rowIndex, style }) => {
                 const idx = rowIndex * COLUMNS + columnIndex;
@@ -346,7 +372,7 @@ export default function WordListPage({
                 if (!word) return null;
 
                 return (
-                  <div style={style} className="px-2">
+                  <div style={style} className="px-1 sm:px-2">
                     <WordCard
                       word={word}
                       isKnown={knownWordIds.includes(word.id)}

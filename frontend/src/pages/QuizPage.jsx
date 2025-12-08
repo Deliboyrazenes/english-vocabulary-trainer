@@ -31,9 +31,7 @@ function levenshtein(a, b) {
     for (let j = 1; j <= b.length; j++) {
       if (a[i - 1] === b[j - 1]) dp[i][j] = dp[i - 1][j - 1];
       else
-        dp[i][j] =
-          1 +
-          Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+        dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
     }
   }
   return dp[a.length][b.length];
@@ -105,13 +103,23 @@ function generateFillSentence(word, pos) {
   const r = (a) => a[Math.floor(Math.random() * a.length)];
 
   if (pos === "verb")
-    return `${r(["I","You","He","She"])} ${r(["will","can","should"])} _____ ${r(["the project","the idea"])} ${r(["tomorrow","soon"])}.`;
+    return `${r(["I", "You", "He", "She"])} ${r([
+      "will",
+      "can",
+      "should",
+    ])} _____ ${r(["the project", "the idea"])} ${r(["tomorrow", "soon"])}.`;
 
   if (pos === "noun")
-    return `${r(["a","the"])} _____ ${r(["is important","is missing"])} ${r(["today","later"])}.`;
+    return `${r(["a", "the"])} _____ ${r(["is important", "is missing"])} ${r([
+      "today",
+      "later",
+    ])}.`;
 
   if (pos === "adj")
-    return `${r(["The idea","The task"])} ${r(["is","looks"])} _____ ${r(["today","these days"])}.`;
+    return `${r(["The idea", "The task"])} ${r(["is", "looks"])} _____ ${r([
+      "today",
+      "these days",
+    ])}.`;
 
   return `Please _____ it later.`;
 }
@@ -190,7 +198,11 @@ export default function QuizPage({ onBack }) {
       result = evaluateAnswer(inputText, current.answer);
     } else {
       if (!selected)
-        result = { status: "wrong", correctAnswer: current.answer, empty: true };
+        result = {
+          status: "wrong",
+          correctAnswer: current.answer,
+          empty: true,
+        };
       else if (selected === current.answer)
         result = { status: "perfect", correctAnswer: current.answer };
       else result = { status: "wrong", correctAnswer: current.answer };
@@ -233,9 +245,15 @@ export default function QuizPage({ onBack }) {
         <div className="bg-white/10 p-10 rounded-3xl shadow-2xl text-center max-w-lg w-full">
           <h1 className="text-4xl font-bold mb-6">Quiz Tamamlandı 🎉</h1>
 
-          <p className="text-xl">✔ Doğru: <b>{correct}</b></p>
-          <p className="text-xl">✘ Yanlış: <b>{wrong}</b></p>
-          <p className="text-xl">○ Boş: <b>{empty}</b></p>
+          <p className="text-xl">
+            ✔ Doğru: <b>{correct}</b>
+          </p>
+          <p className="text-xl">
+            ✘ Yanlış: <b>{wrong}</b>
+          </p>
+          <p className="text-xl">
+            ○ Boş: <b>{empty}</b>
+          </p>
 
           <p className="mt-6 text-3xl font-bold">
             Skor: {correct} / {questions.length}
@@ -259,9 +277,7 @@ export default function QuizPage({ onBack }) {
   /* ======================================================================= */
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 p-6">
-
       <div className="bg-white/10 p-10 rounded-3xl backdrop-blur-xl border border-white/20 shadow-2xl max-w-2xl w-full">
-
         {/* Başlık */}
         <div className="text-center mb-6">
           <h1 className="text-3xl font-bold">Quiz 🚀</h1>
@@ -294,9 +310,7 @@ export default function QuizPage({ onBack }) {
                   cls = "bg-green-500 text-white animate-pulse p-3 rounded-xl";
                 else if (selected === opt)
                   cls = "bg-red-500 text-white shake rounded-xl p-3";
-                else
-                  cls =
-                    "bg-gray-600 text-white opacity-40 p-3 rounded-xl";
+                else cls = "bg-gray-600 text-white opacity-40 p-3 rounded-xl";
               } else if (selected === opt) {
                 cls = "bg-indigo-300 text-black p-3 rounded-xl";
               }
@@ -338,8 +352,7 @@ export default function QuizPage({ onBack }) {
             {status.status === "wrong" && "✘ Yanlış"}
 
             <div className="mt-1">
-              Doğru Cevap:{" "}
-              <b className="text-white">{status.correctAnswer}</b>
+              Doğru Cevap: <b className="text-white">{status.correctAnswer}</b>
             </div>
           </div>
         )}

@@ -1,4 +1,3 @@
-// src/components/WordCard/WordCard.jsx
 import React, { useState, useEffect } from "react";
 
 // 📌 TYPE NORMALİZASYONU
@@ -24,7 +23,7 @@ export default function WordCard({
   onOpenNoteModal,
 }) {
   const [flipped, setFlipped] = useState(false);
-  const [pressed, setPressed] = useState(false); // 🔥 Buton animasyon state
+  const [pressed, setPressed] = useState(false);
 
   useEffect(() => {
     if (flipped) {
@@ -38,7 +37,6 @@ export default function WordCard({
   const frontText = mode === "en-tr" ? word.en : word.tr;
   const backText = mode === "en-tr" ? word.tr : word.en;
 
-  // 🔥 TYPE KEY DÜZELTME
   const typeKey = normalizeType(word.type);
 
   const typeIcons = {
@@ -64,13 +62,24 @@ export default function WordCard({
 
   return (
     <div
-      className="relative cursor-pointer select-none transform transition-all duration-300 hover:scale-105"
+      className="
+        relative cursor-pointer select-none 
+        transform transition-all duration-300 hover:scale-105
+        
+        /* 📱 Mobile */
+        w-[230px] h-[180px]
+
+        /* 📱 Larger phones */
+        sm:w-[250px] sm:h-[190px]
+
+        /* 💻 Normal screens */
+        md:w-[260px] md:h-[200px]
+
+        /* 🖥 Big screens */
+        lg:w-[270px] lg:h-[210px]
+      "
       onClick={() => setFlipped((v) => !v)}
-      style={{
-        width: "260px",
-        height: "200px",
-        perspective: "1000px",
-      }}
+      style={{ perspective: "1000px" }}
     >
       {/* Glow */}
       <div
@@ -87,18 +96,18 @@ export default function WordCard({
       >
         {/* FRONT */}
         <div
-          className="absolute inset-0 bg-white rounded-2xl shadow-xl flex flex-col justify-between p-5"
+          className="absolute inset-0 bg-white rounded-2xl shadow-xl flex flex-col justify-between p-4 sm:p-5"
           style={{ backfaceVisibility: "hidden" }}
         >
           <div
             className={`h-1.5 bg-gradient-to-r ${gradientClass} rounded-full`}
           />
 
-          <h2 className="text-2xl font-bold text-center mt-3 text-gray-800">
+          <h2 className="text-xl sm:text-2xl font-bold text-center mt-3 text-gray-800">
             {frontText}
           </h2>
 
-          <div className="flex items-center justify-between text-xs text-gray-600">
+          <div className="flex items-center justify-between text-[10px] sm:text-xs text-gray-600 mt-2">
             <span className="flex items-center gap-1">
               {typeIcons[typeKey]} {typeKey.toUpperCase()}
             </span>
@@ -112,7 +121,7 @@ export default function WordCard({
 
         {/* BACK */}
         <div
-          className="absolute inset-0 bg-white rounded-2xl shadow-xl flex flex-col justify-between p-5"
+          className="absolute inset-0 bg-white rounded-2xl shadow-xl flex flex-col justify-between p-4 sm:p-5"
           style={{
             backfaceVisibility: "hidden",
             transform: "rotateY(180deg)",
@@ -122,7 +131,9 @@ export default function WordCard({
             className={`h-1.5 bg-gradient-to-r ${gradientClass} rounded-full`}
           />
 
-          <p className="text-xl text-center mt-3 text-gray-700">{backText}</p>
+          <p className="text-lg sm:text-xl text-center mt-3 text-gray-700">
+            {backText}
+          </p>
 
           {/* Known button */}
           <button
@@ -135,9 +146,13 @@ export default function WordCard({
               setPressed(true);
               setTimeout(() => setPressed(false), 600);
             }}
-            className={`w-full py-2 rounded-lg text-white font-semibold bg-gradient-to-r ${gradientClass} ${
-              pressed ? "bounce-success" : ""
-            }`}
+            className={`
+              w-full py-2 sm:py-2.5 
+              rounded-lg text-white font-semibold 
+              bg-gradient-to-r ${gradientClass} 
+              text-sm sm:text-base
+              ${pressed ? "bounce-success" : ""}
+            `}
           >
             {isKnown ? (
               "↩ Geri Al"
@@ -157,7 +172,14 @@ export default function WordCard({
             e.stopPropagation();
             speak();
           }}
-          className="absolute top-2 left-2 bg-indigo-600 text-white px-2 py-1 rounded-lg shadow"
+          className="
+            absolute top-2 left-2 
+            bg-indigo-600 text-white 
+            px-1.5 sm:px-2 py-1 
+            text-xs sm:text-sm
+            rounded-lg shadow
+            transition-all
+          "
         >
           🔊
         </button>
@@ -169,10 +191,16 @@ export default function WordCard({
           e.stopPropagation();
           onOpenNoteModal(word);
         }}
-        className={`absolute top-2 right-2 text-sm px-2 py-1 rounded-lg shadow 
+        className={`
+          absolute top-2 right-2  
+          text-xs sm:text-sm 
+          px-1.5 sm:px-2 py-1 
+          rounded-lg shadow 
+          transition-all
           ${
             note ? "bg-yellow-300 text-yellow-900" : "bg-gray-200 text-gray-600"
-          }`}
+          }
+        `}
       >
         📝
       </button>
