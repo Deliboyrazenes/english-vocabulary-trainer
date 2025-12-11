@@ -5,6 +5,7 @@ import AuthPage from "./pages/AuthPage";
 import WordListPage from "./pages/WordListPage";
 import ProfilePage from "./pages/ProfilePage";
 import QuizPage from "./pages/QuizPage";
+import GlobalNotesPage from "./pages/GlobalNotesPage"; 
 
 function App() {
   // USER STATE
@@ -13,14 +14,12 @@ function App() {
     return stored ? JSON.parse(stored) : null;
   });
 
-  // SCREEN STATE - İlk açılışta doğru ekranı belirler
+  // SCREEN STATE
   const [screen, setScreen] = useState(() => {
     const storedUser = localStorage.getItem("user");
 
-    // Kullanıcı yoksa → her zaman home açılır
     if (!storedUser) return "home";
 
-    // Kullanıcı varsa → önceki ekranı yükle
     return localStorage.getItem("screen") || "words";
   });
 
@@ -67,9 +66,13 @@ function App() {
     localStorage.setItem("screen", "quiz");
   };
 
+  const goToNotes = () => {
+    setScreen("notes");
+    localStorage.setItem("screen", "notes");
+  };
+
   // ---------------- RENDER ----------------
   if (!user) {
-    // Kullanıcı yok → önce Home, sonra AuthPage
     if (screen === "home") {
       return <HomePage onStart={goToAuth} />;
     }
@@ -82,7 +85,6 @@ function App() {
     );
   }
 
-  // Kullanıcı varsa
   return (
     <>
       {screen === "words" && (
@@ -90,6 +92,7 @@ function App() {
           user={user}
           onLogout={handleLogout}
           onOpenProfile={goToProfile}
+          onOpenNotes={goToNotes} 
           onStartQuiz={goToQuiz}
         />
       )}
@@ -99,6 +102,11 @@ function App() {
       )}
 
       {screen === "quiz" && <QuizPage user={user} onBack={goToWords} />}
+
+      {/* 🆕 NOTLAR SAYFASI */}
+      {screen === "notes" && (
+        <GlobalNotesPage user={user} onBack={goToWords} />
+      )}
     </>
   );
 }

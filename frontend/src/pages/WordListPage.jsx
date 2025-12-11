@@ -24,6 +24,7 @@ export default function WordListPage({
   user,
   onLogout,
   onOpenProfile,
+  onOpenNotes,
   onStartQuiz,
 }) {
   const [words, setWords] = useState([]);
@@ -228,6 +229,13 @@ export default function WordListPage({
             <h1 className="text-2xl md:text-3xl font-bold">Hoş geldin 👋</h1>
             <p className="text-white/70 text-sm">{user.name}</p>
           </div>
+
+          <button
+            onClick={onOpenNotes}
+            className="px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 transition-all"
+          >
+            Notlarım
+          </button>
 
           <div className="flex gap-3">
             <button
