@@ -3,7 +3,7 @@ import axios from "axios";
 const API_BASE = process.env.REACT_APP_API_BASE;
 const VERSION = process.env.REACT_APP_VERSION;
 
-// Normal baseURL (version yok!)
+
 const api = axios.create({
   baseURL: API_BASE,
   withCredentials: true,
@@ -12,7 +12,7 @@ const api = axios.create({
   },
 });
 
-// 🔥 Her request’in SONUNA otomatik version paramı ekliyoruz
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
 
@@ -20,16 +20,18 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
-  // URL’ye version ekle (önceden query varsa doğru birleştir)
-  const hasQuery = config.url.includes("?");
-  config.url = hasQuery
-    ? `${config.url}&v=${VERSION}`
-    : `${config.url}?v=${VERSION}`;
+
+  if (VERSION) {
+    const hasQuery = config.url.includes("?");
+    config.url = hasQuery
+      ? `${config.url}&v=${VERSION}`
+      : `${config.url}?v=${VERSION}`;
+  }
 
   return config;
 });
 
-// 🔐 Auth error handling
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
