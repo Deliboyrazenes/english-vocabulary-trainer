@@ -1,73 +1,77 @@
 package com.vocab.vocabapp.controller;
 
-import java.util.List;
-
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.vocab.vocabapp.dto.GlobalNoteRequest;
 import com.vocab.vocabapp.dto.GlobalNoteResponse;
-import com.vocab.vocabapp.repository.UserRepository;
+import com.vocab.vocabapp.security.JwtService;
 import com.vocab.vocabapp.service.GlobalNoteService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/notes/global")
 @RequiredArgsConstructor
 public class GlobalNoteController {
 
-    private final GlobalNoteService service;
-    private final UserRepository userRepository;
-
-    private Long getUserId(UserDetails user) {
-        return userRepository.findByEmail(user.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"))
-                .getId();
-    }
+    private final GlobalNoteService globalNoteService;
+    private final JwtService jwtService;
 
     @GetMapping
-    public List<GlobalNoteResponse> getAll(@AuthenticationPrincipal UserDetails user) {
-        return service.getUserNotes(getUserId(user));
+    public ResponseEntity<List<GlobalNoteResponse>> getAll(HttpServletRequest request) {
+        Long userId = extractUserId(request);
+        return ResponseEntity.ok(globalNoteService.getUserNotes(userId));
     }
 
     @PostMapping
-    public GlobalNoteResponse create(
-            @RequestBody GlobalNoteRequest req,
-            @AuthenticationPrincipal UserDetails user
+    public ResponseEntity<GlobalNoteResponse> create(
+            @RequestBody GlobalNoteRequest request,
+            HttpServletRequest httpRequest
     ) {
-        return service.create(req, getUserId(user));
+        Long userId = extractUserId(httpRequest);
+        return ResponseEntity.ok(globalNoteService.create(request, userId));
     }
 
     @PutMapping
-    public GlobalNoteResponse update(
-            @RequestBody GlobalNoteRequest req,
-            @AuthenticationPrincipal UserDetails user
+    public ResponseEntity<GlobalNoteResponse> update(
+            @RequestBody GlobalNoteRequest request,
+            HttpServletRequest httpRequest
     ) {
-        return service.update(req, getUserId(user));
+        Long userId = extractUserId(httpRequest);
+        return ResponseEntity.ok(globalNoteService.update(request, userId));
     }
 
     @DeleteMapping("/{id}")
-    public void delete(
+    public ResponseEntity<Void> delete(
             @PathVariable Long id,
-            @AuthenticationPrincipal UserDetails user
+            HttpServletRequest httpRequest
     ) {
-        service.delete(id, getUserId(user));
+        Long userId = extractUserId(httpRequest);
+        globalNoteService.delete(id, userId);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/pin")
-    public GlobalNoteResponse togglePin(
+    public ResponseEntity<GlobalNoteResponse> togglePin(
             @PathVariable Long id,
-            @AuthenticationPrincipal UserDetails user
+            HttpServletRequest httpRequest
     ) {
-        return service.togglePin(id, getUserId(user));
+        Long userId = extractUserId(httpRequest);
+        return ResponseEntity.ok(globalNoteService.togglePin(id, userId));
+    }
+
+    private Long extractUserId(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new RuntimeException("Authorization header missing");
+        }
+
+        String token = authHeader.substring(7);
+        return jwtService.extractUserId(token);
     }
 }
