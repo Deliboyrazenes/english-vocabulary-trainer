@@ -1,4 +1,3 @@
-// Theme constants - Tüm renkler, boyutlar ve stiller burada
 export const COLORS = {
   gradients: {
     primary: "from-indigo-600 via-purple-600 to-pink-600",

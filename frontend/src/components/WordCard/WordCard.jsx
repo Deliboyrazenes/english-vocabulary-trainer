@@ -48,10 +48,10 @@ export default function WordCard({
 
   const gradientClass =
     {
-      noun: "from-blue-500 to-indigo-600",
-      verb: "from-purple-500 to-pink-600",
-      adj: "from-green-500 to-teal-600",
-      adv: "from-orange-500 to-red-600",
+      noun: "from-blue-500 to-cyan-500",
+      verb: "from-purple-500 to-fuchsia-500",
+      adj: "from-green-500 to-emerald-500",
+      adv: "from-orange-500 to-red-500",
     }[typeKey] || "from-gray-400 to-gray-600";
 
   const speak = () => {
@@ -81,9 +81,9 @@ export default function WordCard({
       onClick={() => setFlipped((v) => !v)}
       style={{ perspective: "1000px" }}
     >
-      {/* Glow */}
+      {/* Glow Effect - HomePage stilinde */}
       <div
-        className={`absolute inset-0 bg-gradient-to-r ${gradientClass} rounded-2xl blur-xl opacity-20`}
+        className={`absolute inset-0 bg-gradient-to-r ${gradientClass} rounded-2xl blur-xl opacity-30 group-hover:opacity-50 transition-opacity`}
       ></div>
 
       {/* Flip Container */}
@@ -96,23 +96,23 @@ export default function WordCard({
       >
         {/* FRONT */}
         <div
-          className="absolute inset-0 bg-white rounded-2xl shadow-xl flex flex-col justify-between p-4 sm:p-5"
+          className="absolute inset-0 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 flex flex-col justify-between p-4 sm:p-5"
           style={{ backfaceVisibility: "hidden" }}
         >
           <div
-            className={`h-1.5 bg-gradient-to-r ${gradientClass} rounded-full`}
+            className={`h-1.5 bg-gradient-to-r ${gradientClass} rounded-full shadow-lg`}
           />
 
-          <h2 className="text-xl sm:text-2xl font-bold text-center mt-3 text-gray-800">
+          <h2 className="text-xl sm:text-2xl font-black text-center mt-3 text-gray-900">
             {frontText}
           </h2>
 
           <div className="flex items-center justify-between text-[10px] sm:text-xs text-gray-600 mt-2">
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1 font-bold">
               {typeIcons[typeKey]} {typeKey.toUpperCase()}
             </span>
             <span
-              className={`px-2 py-0.5 rounded-full bg-gradient-to-r ${gradientClass} text-white`}
+              className={`px-2.5 py-1 rounded-full bg-gradient-to-r ${gradientClass} text-white font-bold shadow-md`}
             >
               {word.level}
             </span>
@@ -121,21 +121,21 @@ export default function WordCard({
 
         {/* BACK */}
         <div
-          className="absolute inset-0 bg-white rounded-2xl shadow-xl flex flex-col justify-between p-4 sm:p-5"
+          className="absolute inset-0 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 flex flex-col justify-between p-4 sm:p-5"
           style={{
             backfaceVisibility: "hidden",
             transform: "rotateY(180deg)",
           }}
         >
           <div
-            className={`h-1.5 bg-gradient-to-r ${gradientClass} rounded-full`}
+            className={`h-1.5 bg-gradient-to-r ${gradientClass} rounded-full shadow-lg`}
           />
 
-          <p className="text-lg sm:text-xl text-center mt-3 text-gray-700">
+          <p className="text-lg sm:text-xl text-center mt-3 text-gray-800 font-bold">
             {backText}
           </p>
 
-          {/* Known button */}
+          {/* Known button - HomePage gradient stilinde */}
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -148,9 +148,11 @@ export default function WordCard({
             }}
             className={`
               w-full py-2 sm:py-2.5 
-              rounded-lg text-white font-semibold 
+              rounded-xl text-white font-black 
               bg-gradient-to-r ${gradientClass} 
               text-sm sm:text-base
+              shadow-lg hover:shadow-xl
+              transition-all hover:scale-105
               ${pressed ? "bounce-success" : ""}
             `}
           >
@@ -165,7 +167,7 @@ export default function WordCard({
         </div>
       </div>
 
-      {/* 🔊 Speak Button */}
+      {/* 🔊 Speak Button - Modern stil */}
       {mode === "en-tr" && !flipped && (
         <button
           onClick={(e) => {
@@ -174,18 +176,22 @@ export default function WordCard({
           }}
           className="
             absolute top-2 left-2 
-            bg-indigo-600 text-white 
-            px-1.5 sm:px-2 py-1 
+            bg-gradient-to-r from-purple-500 to-fuchsia-500
+            text-white 
+            px-2 sm:px-2.5 py-1.5 
             text-xs sm:text-sm
-            rounded-lg shadow
+            rounded-xl shadow-lg
+            hover:scale-110
             transition-all
+            font-bold
+            border border-white/20
           "
         >
           🔊
         </button>
       )}
 
-      {/* 📝 Note Icon */}
+      {/* 📝 Note Icon - Modern stil */}
       <button
         onClick={(e) => {
           e.stopPropagation();
@@ -194,11 +200,16 @@ export default function WordCard({
         className={`
           absolute top-2 right-2  
           text-xs sm:text-sm 
-          px-1.5 sm:px-2 py-1 
-          rounded-lg shadow 
+          px-2 sm:px-2.5 py-1.5 
+          rounded-xl shadow-lg 
           transition-all
+          hover:scale-110
+          font-bold
+          border border-white/20
           ${
-            note ? "bg-yellow-300 text-yellow-900" : "bg-gray-200 text-gray-600"
+            note
+              ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-white"
+              : "bg-white/90 text-gray-600 hover:bg-white"
           }
         `}
       >

@@ -8,13 +8,13 @@ import QuizPage from "./pages/QuizPage";
 import GlobalNotesPage from "./pages/GlobalNotesPage"; 
 
 function App() {
-  // USER STATE
+
   const [user, setUser] = useState(() => {
     const stored = localStorage.getItem("user");
     return stored ? JSON.parse(stored) : null;
   });
 
-  // SCREEN STATE
+
   const [screen, setScreen] = useState(() => {
     const storedUser = localStorage.getItem("user");
 
@@ -23,7 +23,6 @@ function App() {
     return localStorage.getItem("screen") || "words";
   });
 
-  // ---------------- LOGIN ----------------
   const handleLoginSuccess = (u) => {
     setUser(u);
     localStorage.setItem("user", JSON.stringify(u));
@@ -34,7 +33,6 @@ function App() {
     localStorage.setItem("token", u.token);
   };
 
-  // ---------------- LOGOUT ----------------
   const handleLogout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
@@ -44,7 +42,6 @@ function App() {
     setScreen("home");
   };
 
-  // ---------------- SCREEN SWITCHES ----------------
   const goToAuth = () => {
     setScreen("auth");
     localStorage.setItem("screen", "auth");
@@ -71,7 +68,6 @@ function App() {
     localStorage.setItem("screen", "notes");
   };
 
-  // ---------------- RENDER ----------------
   if (!user) {
     if (screen === "home") {
       return <HomePage onStart={goToAuth} />;

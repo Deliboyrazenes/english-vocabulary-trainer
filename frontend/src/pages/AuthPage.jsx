@@ -12,12 +12,10 @@ export default function AuthPage({ onLoginSuccess, onBackToHome }) {
   const [remember, setRemember] = useState(false);
   const [savedEmails, setSavedEmails] = useState([]);
   const [showEmailList, setShowEmailList] = useState(false);
-
   const [loadingScreen, setLoadingScreen] = useState(true);
 
-  /* ------------------------ LOAD REMEMBER ENTRIES ------------------------ */
   useEffect(() => {
-    const t = setTimeout(() => setLoadingScreen(false), 200);
+    const t = setTimeout(() => setLoadingScreen(false), 400);
 
     const saved = localStorage.getItem("rememberUser");
     if (saved) {
@@ -33,10 +31,8 @@ export default function AuthPage({ onLoginSuccess, onBackToHome }) {
     return () => clearTimeout(t);
   }, []);
 
-  /* ------------------------ SHOW SKELETON ------------------------ */
   if (loadingScreen) return <SkeletonAuth />;
 
-  /* ------------------------ SWITCH LOGIN / REGISTER ------------------------ */
   const switchMode = () => {
     setIsRegister(!isRegister);
     setMessage("");
@@ -49,12 +45,12 @@ export default function AuthPage({ onLoginSuccess, onBackToHome }) {
     }
   };
 
-  /* ------------------------ EMAIL LIST ------------------------ */
   const handleSelectEmail = (selected) => {
     setEmail(selected);
     setShowEmailList(false);
   };
 
+  /* ------------------------ SAVE EMAIL LIST ------------------------ */
   const saveEmailToLocalStorage = (email) => {
     let emails = JSON.parse(localStorage.getItem("savedEmails") || "[]");
 
@@ -66,254 +62,293 @@ export default function AuthPage({ onLoginSuccess, onBackToHome }) {
     }
   };
 
-  /* ------------------------ SUBMIT ------------------------ */
+  /* ------------------------ SUBMIT (LOGIN/REGISTER) ------------------------ */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
 
+    if (!email.trim() || !password.trim()) {
+      setMessage("❌ Lütfen email ve şifre alanlarını doldurun.");
+      return;
+    }
+
+    if (isRegister && !name.trim()) {
+      setMessage("❌ Lütfen ad soyad alanını doldurun.");
+      return;
+    }
+
     try {
       if (isRegister) {
-        const res = await api.post("/users/register", {
-          email,
-          password,
+        await api.post("/users/register", {
           name,
-        });
-
-        if (res.data.id) {
-          setMessage("✅ Kayıt başarılı! Şimdi giriş yapabilirsiniz.");
-          setIsRegister(false);
-          setEmail("");
-          setPassword("");
-          setName("");
-        }
-      } else {
-        const res = await api.post("/users/login", {
           email,
           password,
         });
 
-        if (res.data.token) {
-          if (remember) {
-            localStorage.setItem(
-              "rememberUser",
-              JSON.stringify({ email, password })
-            );
-          } else {
-            localStorage.removeItem("rememberUser");
-          }
-
-          saveEmailToLocalStorage(email);
-
-          const userObj = {
-            token: res.data.token,
-            userId: res.data.userId,
-            email: res.data.email,
-            name: res.data.name,
-          };
-
-          localStorage.setItem("token", res.data.token);
-          localStorage.setItem("user", JSON.stringify(userObj));
-
-          onLoginSuccess(userObj);
-        } else {
-          setMessage("❌ Email veya şifre hatalı.");
-        }
+        setMessage("✅ Kayıt başarılı! Şimdi giriş yapabilirsiniz.");
+        setIsRegister(false);
+        setEmail("");
+        setPassword("");
+        setName("");
+        return;
       }
-    } catch (err) {
-      console.error("Auth error:", err);
 
-      if (err.response?.status === 401) {
-        setMessage("❌ Email veya şifre hatalı.");
-      } else if (err.response?.status === 403) {
-        setMessage("❌ Erişim engellendi. Lütfen tekrar deneyin.");
-      } else {
-        setMessage(
-          "🚨 Sunucuya ulaşılamadı: " +
-            (err.response?.data?.error || err.message)
+      const response = await api.post("/users/login", {
+        email,
+        password,
+      });
+
+      const user = response.data;
+
+      if (!user || !user.token) {
+        setMessage("❌ Giriş başarısız. Bilgileri kontrol edin.");
+        return;
+      }
+
+      if (remember) {
+        localStorage.setItem(
+          "rememberUser",
+          JSON.stringify({ email, password })
         );
+      } else {
+        localStorage.removeItem("rememberUser");
       }
+
+      saveEmailToLocalStorage(email);
+
+      localStorage.setItem("token", user.token);
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("screen", "words");
+
+      onLoginSuccess(user);
+    } catch (err) {
+      console.error("AUTH ERROR:", err);
+      setMessage("❌ Email veya şifre hatalı.");
     }
   };
 
-  /* ------------------------ UI ------------------------ */
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 p-4 sm:p-6">
-      <div
-        className="absolute top-4 sm:top-6 left-4 sm:left-6 flex items-center gap-2 cursor-pointer text-white/80 hover:text-white transition"
-        onClick={onBackToHome}
-      >
-        <span className="text-xl sm:text-2xl">📚</span>
-        <span className="font-semibold text-base sm:text-lg">VocabZone</span>
+    <div className="min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-violet-950 via-fuchsia-950 to-purple-950">
+      {/* Animated Background */}
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute top-0 -left-4 w-72 h-72 sm:w-96 sm:h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+        <div className="absolute top-0 -right-4 w-72 h-72 sm:w-96 sm:h-96 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-20 w-72 h-72 sm:w-96 sm:h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
       </div>
 
-      <div className="w-full max-w-xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 md:p-10 lg:p-12 relative mt-12 sm:mt-0">
-        <div className="flex flex-col items-center mb-6 sm:mb-8 md:mb-10">
-          <div className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-xl sm:rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg mb-3 sm:mb-4">
-            <span className="text-3xl sm:text-3xl md:text-4xl">📚</span>
-          </div>
+      {/* Grid Overlay */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgb(255_255_255/0.12)_1px,transparent_0)] bg-[size:40px_40px]"></div>
 
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-1">
-            {isRegister ? "Create Account" : "Welcome Back"}
-          </h1>
-          <p className="text-gray-500 text-xs sm:text-sm md:text-base text-center px-4">
-            {isRegister
-              ? "Join us and start learning English!"
-              : "Login to continue your journey"}
-          </p>
-        </div>
-
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-4 sm:space-y-5 md:space-y-6"
+      {/* Back Button */}
+      <div className="absolute top-4 sm:top-6 left-4 sm:left-6 z-20">
+        <button
+          onClick={onBackToHome}
+          className="flex items-center gap-2 sm:gap-3 px-4 sm:px-5 py-2 sm:py-2.5 bg-white/10 backdrop-blur-md border-2 border-white/20 rounded-xl text-white font-bold hover:bg-white/20 hover:border-white/40 transition-all hover:scale-105"
         >
-          {/* EMAIL INPUT */}
-          <div className="relative">
-            <label className="block text-xs sm:text-sm font-semibold text-gray-600 mb-1.5 sm:mb-2">
-              Email Address
-            </label>
+          <span className="text-lg sm:text-xl">←</span>
+          Ana Sayfa
+        </button>
+      </div>
 
-            <input
-              type="email"
-              value={email}
-              required
-              placeholder="example@mail.com"
-              onFocus={() => !isRegister && setShowEmailList(true)}
-              onBlur={() => setTimeout(() => setShowEmailList(false), 120)}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all duration-200 text-sm sm:text-base"
-            />
+      {/* Main Card */}
+      <div className="relative z-10 min-h-screen flex items-center justify-center p-4 sm:p-6">
+        <div className="w-full max-w-xl">
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 sm:p-10 shadow-2xl">
+            {/* Header */}
+            <div className="flex flex-col items-center mb-10">
+              <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-pink-500 rounded-2xl flex items-center justify-center text-4xl shadow-xl mb-4 rotate-12 hover:rotate-0 transition-transform">
+                📚
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-black text-white mb-2">
+                {isRegister ? "Hesap Oluştur" : "Hoş Geldin! 👋"}
+              </h1>
+              <p className="text-white/70 text-sm sm:text-base text-center">
+                {isRegister
+                  ? "Aramıza katıl ve öğrenmeye başla!"
+                  : "Kelime yolculuğuna devam et"}
+              </p>
+            </div>
 
-            {showEmailList && savedEmails.length > 0 && !isRegister && (
-              <div className="absolute top-full mt-2 w-full bg-white shadow-lg border border-gray-200 rounded-xl overflow-hidden z-40">
-                {savedEmails.map((mail, i) => (
+            {/* Form */}
+            <div className="space-y-5">
+              {/* Email */}
+              <div className="relative">
+                <label className="block text-sm font-bold text-white/90 mb-2">
+                  📧 Email Adresi
+                </label>
+
+                <input
+                  type="email"
+                  value={email}
+                  placeholder="ornek@mail.com"
+                  onFocus={() => !isRegister && setShowEmailList(true)}
+                  onBlur={() => setTimeout(() => setShowEmailList(false), 200)}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-5 py-4 rounded-2xl bg-white/10 border-2 border-white/20 text-white placeholder-white/40 focus:border-yellow-400 transition-all"
+                />
+
+                {showEmailList && savedEmails.length > 0 && !isRegister && (
+                  <div className="absolute top-full mt-3 w-full bg-purple-900/95 border-2 border-white/20 rounded-2xl overflow-hidden z-40 shadow-2xl backdrop-blur-xl">
+                    {savedEmails.map((mail, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onMouseDown={() => handleSelectEmail(mail)}
+                        className="w-full text-left px-5 py-4 hover:bg-white/20 text-white flex items-center gap-3 border-b border-white/10 last:border-0"
+                      >
+                        👤 {mail}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Name (Only Register) */}
+              {isRegister && (
+                <div>
+                  <label className="block text-sm font-bold text-white/90 mb-2">
+                    👤 Ad Soyad
+                  </label>
+
+                  <input
+                    type="text"
+                    value={name}
+                    placeholder="Adınızı girin"
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full px-5 py-4 rounded-2xl bg-white/10 border-2 border-white/20 text-white placeholder-white/40 focus:border-yellow-400 transition-all"
+                  />
+                </div>
+              )}
+
+              {/* Password */}
+              <div>
+                <label className="block text-sm font-bold text-white/90 mb-2">
+                  🔒 Şifre
+                </label>
+
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    placeholder="••••••••"
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-5 py-4 pr-14 rounded-2xl bg-white/10 border-2 border-white/20 text-white placeholder-white/40 focus:border-yellow-400 transition-all"
+                  />
+
                   <button
-                    key={i}
-                    onMouseDown={() => handleSelectEmail(mail)}
-                    className="w-full text-left px-3 sm:px-4 py-2 hover:bg-gray-100 text-gray-700 text-sm sm:text-base"
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-2xl hover:scale-110 transition-transform"
                   >
-                    {mail}
+                    {showPassword ? "🙈" : "👁️"}
                   </button>
-                ))}
+                </div>
+              </div>
+
+              {/* Remember me */}
+              {!isRegister && (
+                <div className="flex items-center gap-3">
+                  <input
+                    id="remember"
+                    type="checkbox"
+                    checked={remember}
+                    onChange={(e) => setRemember(e.target.checked)}
+                    className="w-5 h-5 rounded cursor-pointer"
+                  />
+                  <label htmlFor="remember" className="text-white/80">
+                    Beni Hatırla
+                  </label>
+                </div>
+              )}
+
+              {/* Submit */}
+              <button
+                onClick={handleSubmit}
+                className="w-full py-4 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl text-black font-extrabold text-lg shadow-xl hover:scale-105 transition-all"
+              >
+                {isRegister ? "🚀 Hesap Oluştur" : "🎯 Giriş Yap"}
+              </button>
+            </div>
+
+            {/* Message */}
+            {message && (
+              <div
+                className={`mt-6 text-center p-4 rounded-2xl font-semibold backdrop-blur-md ${
+                  message.includes("✅")
+                    ? "bg-green-500/20 text-green-200 border border-green-400/20"
+                    : "bg-red-500/20 text-red-200 border border-red-400/20"
+                }`}
+              >
+                {message}
               </div>
             )}
-          </div>
 
-          {/* REGISTER MODE FULL NAME */}
-          {isRegister && (
-            <div>
-              <label className="block text-xs sm:text-sm font-semibold text-gray-600 mb-1.5 sm:mb-2">
-                Full Name
-              </label>
-              <input
-                type="text"
-                value={name}
-                placeholder="John Doe"
-                onChange={(e) => setName(e.target.value)}
-                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all duration-200 text-sm sm:text-base"
-              />
+            {/* Divider */}
+            <div className="flex items-center my-8">
+              <div className="flex-1 border-t border-white/20"></div>
+              <span className="px-4 text-white/60 text-sm">veya</span>
+              <div className="flex-1 border-t border-white/20"></div>
             </div>
-          )}
 
-          {/* PASSWORD */}
-          <div>
-            <label className="block text-xs sm:text-sm font-semibold text-gray-600 mb-1.5 sm:mb-2">
-              Password
-            </label>
-
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                required
-                placeholder="••••••••"
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 pr-10 sm:pr-12 rounded-xl bg-gray-50 border border-gray-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all duration-200 text-sm sm:text-base"
-              />
-
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-2.5 sm:right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 text-lg sm:text-xl"
-              >
-                {showPassword ? "🙈" : "👁️"}
-              </button>
+            {/* Switch Mode */}
+            <div className="text-center text-white/70">
+              {isRegister ? (
+                <>
+                  Zaten hesabın var mı?{" "}
+                  <button
+                    onClick={switchMode}
+                    className="text-yellow-400 font-bold hover:text-yellow-300"
+                  >
+                    Giriş Yap →
+                  </button>
+                </>
+              ) : (
+                <>
+                  Hesabın yok mu?{" "}
+                  <button
+                    onClick={switchMode}
+                    className="text-yellow-400 font-bold hover:text-yellow-300"
+                  >
+                    Kayıt Ol →
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
-          {/* REMEMBER ME */}
-          {!isRegister && (
-            <div className="flex items-center gap-2">
-              <input
-                id="remember"
-                type="checkbox"
-                checked={remember}
-                onChange={(e) => setRemember(e.target.checked)}
-                className="w-3.5 h-3.5 sm:w-4 sm:h-4"
-              />
-              <label
-                htmlFor="remember"
-                className="text-xs sm:text-sm text-gray-700"
-              >
-                Remember Me
-              </label>
-            </div>
-          )}
-
-          {/* SUBMIT BUTTON */}
-          <button
-            type="submit"
-            className="w-full py-3 sm:py-3.5 rounded-xl font-semibold text-white text-base sm:text-lg shadow-md bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 hover:scale-[1.02]"
-          >
-            {isRegister ? "Create Account" : "Login"}
-          </button>
-        </form>
-
-        {/* FOOTER + SWITCH MODE */}
-        <div className="flex items-center my-6 sm:my-8">
-          <div className="flex-1 border-t border-gray-300"></div>
-          <span className="px-3 sm:px-4 text-gray-500 text-xs sm:text-sm">
-            or
-          </span>
-          <div className="flex-1 border-t border-gray-300"></div>
+          {/* Footer */}
+          <div className="mt-6 text-center">
+            <p className="text-white/40 text-xs">
+              🚀 Öğrenme yolculuğun burada başlıyor.
+            </p>
+          </div>
         </div>
-
-        <p className="text-center text-gray-700 text-xs sm:text-sm md:text-base">
-          {isRegister ? (
-            <>
-              Already have an account?{" "}
-              <button
-                className="text-indigo-600 font-semibold"
-                onClick={switchMode}
-              >
-                Login →
-              </button>
-            </>
-          ) : (
-            <>
-              Don't have an account?{" "}
-              <button
-                className="text-indigo-600 font-semibold"
-                onClick={switchMode}
-              >
-                Register →
-              </button>
-            </>
-          )}
-        </p>
-
-        {/* MESSAGE */}
-        {message && (
-          <div
-            className={`mt-4 sm:mt-6 text-center p-3 sm:p-4 rounded-xl font-medium text-xs sm:text-sm md:text-base ${
-              message.includes("✅")
-                ? "bg-green-100 text-green-700"
-                : "bg-red-100 text-red-700"
-            }`}
-          >
-            {message}
-          </div>
-        )}
       </div>
+
+      {/* BLOB Animations */}
+      <style jsx>{`
+        @keyframes blob {
+          0%,
+          100% {
+            transform: translate(0px, 0px) scale(1);
+          }
+          33% {
+            transform: translate(30px, -50px) scale(1.1);
+          }
+          66% {
+            transform: translate(-20px, 20px) scale(0.9);
+          }
+        }
+        .animate-blob {
+          animation: blob 7s infinite;
+        }
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
+      `}</style>
     </div>
   );
 }

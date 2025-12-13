@@ -1,7 +1,5 @@
-// src/pages/QuizPage.jsx
 import React, { useState, useMemo } from "react";
 
-/* ----------------- GELİŞMİŞ NORMALIZE (TÜRKÇE DESTEKLİ) ----------------- */
 function normalize(str) {
   if (!str) return "";
   return str
@@ -16,10 +14,9 @@ function normalize(str) {
     .replaceAll("ö", "o")
     .replaceAll("ü", "u")
     .replaceAll("ı", "i")
-    .replace(/[^a-z0-9]/g, ""); // tüm özel karakterleri temizle
+    .replace(/[^a-z0-9]/g, "");
 }
 
-/* ----------------- Levenshtein ----------------- */
 function levenshtein(a, b) {
   const dp = Array.from({ length: a.length + 1 }, () =>
     Array(b.length + 1).fill(0)
@@ -37,7 +34,6 @@ function levenshtein(a, b) {
   return dp[a.length][b.length];
 }
 
-/* ---------------------- GELİŞMİŞ TÜRKÇE TYPO DEĞERLENDİRME ---------------------- */
 function evaluateAnswer(userAnswer, correctAnswer) {
   const user = normalize(userAnswer);
   const correct = normalize(correctAnswer);
@@ -49,11 +45,6 @@ function evaluateAnswer(userAnswer, correctAnswer) {
   if (user === correct) return { status: "perfect", correctAnswer };
 
   const dist = levenshtein(user, correct);
-
-  /* ---------------------------------------------------------
-   TÜM KÖTÜ→KÖTÜÜ, BARIS→BARIŞ, KÖTTÜ, BARRIŞ gibi varyasyonların
-   tamamını DOĞRU saymak için geniş tolerans:
-  --------------------------------------------------------- */
 
   // kısa kelimelerde ( ≤ 4 ) → max 2 fark
   if (correct.length <= 4 && dist <= 2) {
@@ -88,7 +79,6 @@ function evaluateAnswer(userAnswer, correctAnswer) {
   return { status: "wrong", correctAnswer };
 }
 
-/* ---------------- pos normalize ---------------- */
 function normalizePos(pos) {
   if (!pos) return "unknown";
   const x = pos.toLowerCase();
@@ -98,7 +88,6 @@ function normalizePos(pos) {
   return "unknown";
 }
 
-/* ---------------- fill cümlesi ---------------- */
 function generateFillSentence(word, pos) {
   const r = (a) => a[Math.floor(Math.random() * a.length)];
 
@@ -124,9 +113,6 @@ function generateFillSentence(word, pos) {
   return `Please _____ it later.`;
 }
 
-/* ======================================================================= */
-/*                                QUIZ PAGE                                */
-/* ======================================================================= */
 export default function QuizPage({ onBack }) {
   const { settings, words } = window.quizData || {};
 
@@ -137,7 +123,6 @@ export default function QuizPage({ onBack }) {
   const [results, setResults] = useState([]);
   const [finished, setFinished] = useState(false);
 
-  /* ---------------- Soru oluşturma ---------------- */
   const questions = useMemo(() => {
     if (!settings || !words) return [];
     return words.map((w, idx) => {
@@ -190,7 +175,6 @@ export default function QuizPage({ onBack }) {
 
   const current = questions[index];
 
-  /* ---------------- cevap kontrol ---------------- */
   const checkAnswer = () => {
     let result;
 
@@ -211,7 +195,6 @@ export default function QuizPage({ onBack }) {
     setStatus(result);
   };
 
-  /* ---------------- sonraki soru ---------------- */
   const next = () => {
     setResults((p) => [
       ...p,
@@ -230,9 +213,6 @@ export default function QuizPage({ onBack }) {
     else setIndex(index + 1);
   };
 
-  /* ======================================================================= */
-  /*                               BİTİŞ EKRANI                              */
-  /* ======================================================================= */
   if (finished) {
     const correct = results.filter(
       (r) => r.status === "perfect" || r.status === "typo-ok"
@@ -272,9 +252,6 @@ export default function QuizPage({ onBack }) {
 
   if (!current) return null;
 
-  /* ======================================================================= */
-  /*                               SORU EKRANI                                */
-  /* ======================================================================= */
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 p-6">
       <div className="bg-white/10 p-10 rounded-3xl backdrop-blur-xl border border-white/20 shadow-2xl max-w-2xl w-full">

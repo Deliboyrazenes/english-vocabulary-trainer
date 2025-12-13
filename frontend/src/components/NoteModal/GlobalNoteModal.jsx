@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 
-export default function GlobalNoteModal({ word, note, onSaveNote, onDeleteNote, onClose }) {
+export default function GlobalNoteModal({
+  word,
+  note,
+  onSaveNote,
+  onDeleteNote,
+  onClose,
+}) {
   const [draft, setDraft] = useState(note || "");
   const [charCount, setCharCount] = useState((note || "").length);
   const [isSaving, setIsSaving] = useState(false);
@@ -9,13 +15,12 @@ export default function GlobalNoteModal({ word, note, onSaveNote, onDeleteNote, 
     setCharCount(draft.length);
   }, [draft]);
 
-  // Demo word data
   const demoWord = word || {
     id: 1,
     en: "example",
     tr: "örnek",
     type: "noun",
-    level: "A1"
+    level: "A1",
   };
 
   const MAX_CHARS = 500;
@@ -24,7 +29,7 @@ export default function GlobalNoteModal({ word, note, onSaveNote, onDeleteNote, 
   const handleSave = async () => {
     if (draft.trim()) {
       setIsSaving(true);
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       if (onSaveNote) onSaveNote(demoWord.id, draft.trim());
       setIsSaving(false);
       if (onClose) onClose();
@@ -46,19 +51,17 @@ export default function GlobalNoteModal({ word, note, onSaveNote, onDeleteNote, 
   };
 
   return (
-    <div 
-      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4"
-    >
-      <div 
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4">
+      <div
         className="bg-white w-full max-w-3xl rounded-3xl shadow-2xl relative overflow-hidden"
-        style={{ maxWidth: '52rem' }}
+        style={{ maxWidth: "52rem" }}
       >
         {/* Header with Gradient */}
         <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 p-6 text-white relative overflow-hidden">
           {/* Decorative circles */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl" />
           <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
-          
+
           <div className="relative flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3 mb-2">
@@ -123,16 +126,28 @@ export default function GlobalNoteModal({ word, note, onSaveNote, onDeleteNote, 
                     cx="24"
                     cy="24"
                     r="20"
-                    stroke={progress > 90 ? "#ef4444" : progress > 70 ? "#f59e0b" : "#6366f1"}
+                    stroke={
+                      progress > 90
+                        ? "#ef4444"
+                        : progress > 70
+                        ? "#f59e0b"
+                        : "#6366f1"
+                    }
                     strokeWidth="3"
                     fill="none"
                     strokeDasharray={`${progress * 1.25} 125`}
                     className="transition-all duration-300"
                   />
                 </svg>
-                <span className={`absolute inset-0 flex items-center justify-center text-xs font-bold ${
-                  progress > 90 ? "text-red-600" : progress > 70 ? "text-amber-600" : "text-indigo-600"
-                }`}>
+                <span
+                  className={`absolute inset-0 flex items-center justify-center text-xs font-bold ${
+                    progress > 90
+                      ? "text-red-600"
+                      : progress > 70
+                      ? "text-amber-600"
+                      : "text-indigo-600"
+                  }`}
+                >
                   {charCount}
                 </span>
               </div>
@@ -142,7 +157,17 @@ export default function GlobalNoteModal({ word, note, onSaveNote, onDeleteNote, 
           {/* Helper Text */}
           <div className="mt-3 flex items-center gap-2 text-xs text-gray-500">
             <span>💡</span>
-            <span className="text-gray-600">İpucu: <kbd className="px-2 py-1 bg-gray-100 rounded border border-gray-300 font-mono text-xs text-gray-700">Ctrl</kbd> + <kbd className="px-2 py-1 bg-gray-100 rounded border border-gray-300 font-mono text-xs text-gray-700">Enter</kbd> ile hızlı kaydet</span>
+            <span className="text-gray-600">
+              İpucu:{" "}
+              <kbd className="px-2 py-1 bg-gray-100 rounded border border-gray-300 font-mono text-xs text-gray-700">
+                Ctrl
+              </kbd>{" "}
+              +{" "}
+              <kbd className="px-2 py-1 bg-gray-100 rounded border border-gray-300 font-mono text-xs text-gray-700">
+                Enter
+              </kbd>{" "}
+              ile hızlı kaydet
+            </span>
           </div>
 
           {/* Action Buttons */}
@@ -156,7 +181,7 @@ export default function GlobalNoteModal({ word, note, onSaveNote, onDeleteNote, 
                   <span>🗑️</span> <span className="text-red-600">Notu Sil</span>
                 </button>
               )}
-              
+
               <button
                 onClick={() => setDraft("")}
                 className="px-5 py-3 rounded-xl bg-gray-50 hover:bg-gray-100 border-2 border-gray-200 text-gray-600 font-semibold transition-all duration-200 hover:scale-105 active:scale-95"

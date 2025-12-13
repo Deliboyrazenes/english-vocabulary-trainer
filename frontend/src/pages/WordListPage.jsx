@@ -54,8 +54,8 @@ export default function WordListPage({
       try {
         const [wordsRes, knownRes, notesRes] = await Promise.all([
           api.get("/words"),
-          api.get("/known-words"), // userId kaldırıldı
-          api.get("/notes/by-user"), // userId kaldırıldı
+          api.get("/known-words"),
+          api.get("/notes/by-user"),
         ]);
 
         setWords(wordsRes.data);
@@ -212,191 +212,196 @@ export default function WordListPage({
 
   /* ------------------------ RENDER ------------------------ */
   return (
-    <div className="min-h-screen p-4 md:p-6 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 overflow-auto text-white">
-      <div className="max-w-[1800px] mx-auto">
-        {/* HEADER */}
-        <div
-          className="
-  bg-white/10 p-3 sm:p-4 md:p-5 
-  rounded-3xl mb-4 sm:mb-6 
-  border border-white/20 shadow-xl backdrop-blur-md 
-  flex flex-col sm:flex-row 
-  justify-between sm:items-center 
-  gap-3 sm:gap-4
-"
-        >
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold">Hoş geldin 👋</h1>
-            <p className="text-white/70 text-sm">{user.name}</p>
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-violet-950 via-fuchsia-950 to-purple-950">
+      {/* Animated Background Blobs */}
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute top-0 -left-4 w-72 h-72 sm:w-96 sm:h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+        <div className="absolute top-0 -right-4 w-72 h-72 sm:w-96 sm:h-96 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-20 w-72 h-72 sm:w-96 sm:h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
+      </div>
+
+      {/* Grid Pattern Overlay */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgb(255_255_255/0.15)_1px,transparent_0)] bg-[size:40px_40px]"></div>
+
+      <div className="relative z-10 p-4 md:p-6 overflow-auto text-white">
+        <div className="max-w-[1800px] mx-auto">
+          {/* MODERN PROFESSIONAL HEADER */}
+          <nav className="flex items-center justify-between px-4 sm:px-6 md:px-8 py-4 sm:py-5 mb-6 sm:mb-8 bg-white/5 backdrop-blur-md rounded-2xl sm:rounded-3xl border border-white/20 shadow-xl">
+            {/* Logo & Welcome */}
+            <div className="flex items-center gap-4 sm:gap-6">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl sm:rounded-2xl flex items-center justify-center text-2xl sm:text-3xl shadow-xl rotate-6 hover:rotate-0 transition-transform cursor-pointer border-2 border-white/20">
+                📚
+              </div>
+
+              <div>
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight">
+                  Vocab<span className="text-yellow-400">Zone</span>
+                </h1>
+                <p className="text-xs sm:text-sm text-white/60 font-semibold">
+                  Hoş geldin, {user.name} 👋
+                </p>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Notes Button */}
+              <button
+                onClick={onOpenNotes}
+                className="group relative px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-xl bg-white/10 backdrop-blur-sm border-2 border-white/20 hover:bg-white/20 hover:border-white/40 transition-all hover:scale-105 font-bold text-xs sm:text-sm flex items-center gap-2 shadow-lg"
+              >
+                <span className="text-lg sm:text-xl">📝</span>
+                <span className="hidden sm:inline">Notlarım</span>
+              </button>
+
+              {/* Profile Button */}
+              <button
+                onClick={onOpenProfile}
+                className="px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-xl bg-white/10 backdrop-blur-sm border-2 border-white/20 hover:bg-white/20 hover:border-white/40 transition-all hover:scale-105 font-bold text-xs sm:text-sm flex items-center gap-2 shadow-lg"
+              >
+                <span className="text-lg sm:text-xl">👤</span>
+                <span className="hidden md:inline">Profil</span>
+              </button>
+
+              {/* Logout Button */}
+              <button
+                onClick={onLogout}
+                className="px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-xl bg-red-500/90 backdrop-blur-sm border-2 border-red-400/40 hover:bg-red-600 hover:border-red-400/60 transition-all hover:scale-105 font-bold text-xs sm:text-sm flex items-center gap-2 shadow-lg"
+              >
+                <span className="text-lg sm:text-xl">🚪</span>
+                <span className="hidden md:inline">Çıkış</span>
+              </button>
+            </div>
+          </nav>
+
+          {/* FILTER */}
+          <FilterBar
+            level={filters.level}
+            type={filters.type}
+            search={filters.search}
+            onFilterChange={(k, v) => setFilters((p) => ({ ...p, [k]: v }))}
+          />
+
+          {/* STATS */}
+          <StatsBar
+            total={words.length}
+            a1={words.filter((w) => w.level === "A1").length}
+            a2={words.filter((w) => w.level === "A2").length}
+            b1={words.filter((w) => w.level === "B1").length}
+            b2={words.filter((w) => w.level === "B2").length}
+            c1={words.filter((w) => w.level === "C1").length}
+            known={knownWordIds.length}
+          />
+
+          {/* Controls Section */}
+          <div className="flex justify-center mb-6 sm:mb-8 gap-2 sm:gap-3 md:gap-4 flex-wrap px-2 sm:px-4">
+            {/* Tabs */}
+            <div className="bg-white/5 backdrop-blur-md p-2 rounded-2xl inline-flex border border-white/20 shadow-xl">
+              <button
+                className={`px-4 md:px-6 py-2 md:py-3 rounded-xl font-bold text-sm md:text-base transition-all ${
+                  !showKnown
+                    ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-black shadow-lg scale-105"
+                    : "text-white hover:bg-white/10"
+                }`}
+                onClick={() => setShowKnown(false)}
+              >
+                📘 Tüm Kelimeler
+              </button>
+
+              <button
+                className={`px-4 md:px-6 py-2 md:py-3 rounded-xl font-bold text-sm md:text-base transition-all ${
+                  showKnown
+                    ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-black shadow-lg scale-105"
+                    : "text-white hover:bg-white/10"
+                }`}
+                onClick={() => setShowKnown(true)}
+              >
+                ✓ Bildiklerim
+              </button>
+            </div>
+
+            {/* Mode */}
+            <div className="bg-white/5 backdrop-blur-md p-2 rounded-2xl inline-flex border border-white/20 shadow-xl">
+              <button
+                className={`px-4 md:px-6 py-2 md:py-3 rounded-xl font-bold text-sm md:text-base transition-all ${
+                  mode === "en-tr"
+                    ? "bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white shadow-lg scale-105"
+                    : "text-white hover:bg-white/10"
+                }`}
+                onClick={() => setMode("en-tr")}
+              >
+                EN → TR
+              </button>
+
+              <button
+                className={`px-4 md:px-6 py-2 md:py-3 rounded-xl font-bold text-sm md:text-base transition-all ${
+                  mode === "tr-en"
+                    ? "bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white shadow-lg scale-105"
+                    : "text-white hover:bg-white/10"
+                }`}
+                onClick={() => setMode("tr-en")}
+              >
+                TR → EN
+              </button>
+            </div>
+
+            {/* Shuffle */}
+            <button
+              onClick={() => setShuffled(!shuffled)}
+              className={`px-4 md:px-6 py-2 md:py-3 rounded-xl font-bold text-sm md:text-base transition-all ${
+                shuffled
+                  ? "bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg scale-105"
+                  : "bg-white/5 text-white hover:bg-white/10 border border-white/20"
+              }`}
+            >
+              🔀 {shuffled ? "Karışık" : "Normal"}
+            </button>
+
+            {/* Quiz Button */}
+            <button
+              onClick={() => setShowQuizSetup(true)}
+              className="px-4 md:px-6 py-2 md:py-3 rounded-xl font-bold text-sm md:text-base bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white shadow-lg transition-all hover:scale-105"
+            >
+              🧠 Quiz Başlat
+            </button>
           </div>
 
-          <button
-            onClick={onOpenNotes}
-            className="px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 transition-all"
-          >
-            Notlarım
-          </button>
+          {/* Word Grid */}
+          <div className="flex justify-center">
+            <div className="bg-white/5 backdrop-blur-md p-3 sm:p-4 md:p-6 rounded-2xl sm:rounded-3xl border border-white/20 shadow-2xl overflow-hidden">
+              <Grid
+                columnCount={COLUMNS}
+                columnWidth={CARD_WIDTH + GAP}
+                height={GRID_HEIGHT}
+                rowCount={rowCount}
+                rowHeight={CARD_HEIGHT + GAP}
+                width={Math.min((CARD_WIDTH + GAP) * COLUMNS, screenWidth - 20)}
+              >
+                {({ columnIndex, rowIndex, style }) => {
+                  const idx = rowIndex * COLUMNS + columnIndex;
+                  const word = filteredWords[idx];
 
-          <div className="flex gap-3">
-            <button
-              onClick={onOpenProfile}
-              className="px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 transition-all"
-            >
-              Profil
-            </button>
-            <button
-              onClick={onLogout}
-              className="px-4 py-2 rounded-xl bg-red-500 hover:bg-red-600 transition-all"
-            >
-              Çıkış
-            </button>
-          </div>
-        </div>
+                  if (!word) return null;
 
-        {/* FILTER */}
-        <FilterBar
-          level={filters.level}
-          type={filters.type}
-          search={filters.search}
-          onFilterChange={(k, v) => setFilters((p) => ({ ...p, [k]: v }))}
-        />
-
-        {/* STATS */}
-        <StatsBar
-          total={words.length}
-          a1={words.filter((w) => w.level === "A1").length}
-          a2={words.filter((w) => w.level === "A2").length}
-          b1={words.filter((w) => w.level === "B1").length}
-          b2={words.filter((w) => w.level === "B2").length}
-          c1={words.filter((w) => w.level === "C1").length}
-          known={knownWordIds.length}
-        />
-
-        {/* Controls Section */}
-        <div
-          className="
-  flex justify-center 
-  mb-6 sm:mb-8 
-  gap-2 sm:gap-3 md:gap-4 
-  flex-wrap 
-  px-2 sm:px-4
-"
-        >
-          {/* Tabs */}
-          <div className="bg-white/10 backdrop-blur-md p-2 rounded-2xl inline-flex border border-white/20 shadow-xl">
-            <button
-              className={`px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-sm md:text-base transition-all ${
-                !showKnown
-                  ? "bg-white text-indigo-600 shadow-lg scale-105"
-                  : "text-white hover:bg-white/10"
-              }`}
-              onClick={() => setShowKnown(false)}
-            >
-              📘 Tüm Kelimeler
-            </button>
-
-            <button
-              className={`px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-sm md:text-base transition-all ${
-                showKnown
-                  ? "bg-white text-indigo-600 shadow-lg scale-105"
-                  : "text-white hover:bg-white/10"
-              }`}
-              onClick={() => setShowKnown(true)}
-            >
-              ✓ Bildiklerim
-            </button>
-          </div>
-
-          {/* Mode */}
-          <div className="bg-white/10 backdrop-blur-md p-2 rounded-2xl inline-flex border border-white/20 shadow-xl">
-            <button
-              className={`px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-sm md:text-base transition-all ${
-                mode === "en-tr"
-                  ? "bg-white text-indigo-600 shadow-lg scale-105"
-                  : "text-white hover:bg-white/10"
-              }`}
-              onClick={() => setMode("en-tr")}
-            >
-              EN → TR
-            </button>
-
-            <button
-              className={`px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-sm md:text-base transition-all ${
-                mode === "tr-en"
-                  ? "bg-white text-indigo-600 shadow-lg scale-105"
-                  : "text-white hover:bg-white/10"
-              }`}
-              onClick={() => setMode("tr-en")}
-            >
-              TR → EN
-            </button>
-          </div>
-
-          {/* Shuffle */}
-          <button
-            onClick={() => setShuffled(!shuffled)}
-            className={`px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-sm md:text-base transition-all ${
-              shuffled
-                ? "bg-white text-indigo-600 shadow-lg scale-105"
-                : "bg-white/10 text-white hover:bg-white/20 border border-white/20"
-            }`}
-          >
-            🔀 {shuffled ? "Karışık" : "Normal"}
-          </button>
-
-          {/* Quiz Button */}
-          <button
-            onClick={() => setShowQuizSetup(true)}
-            className="px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-sm md:text-base bg-emerald-500 hover:bg-emerald-600 shadow-lg transition-all"
-          >
-            🧠 Quiz Başlat
-          </button>
-        </div>
-
-        {/* Word Grid - Centered with Better Spacing */}
-        <div className="flex justify-center">
-          <div
-            className="
-  bg-white/10 
-  p-3 sm:p-4 md:p-6 
-  rounded-3xl 
-  border border-white/20 
-  shadow-2xl backdrop-blur-md
-  overflow-hidden
-"
-          >
-            <Grid
-              columnCount={COLUMNS}
-              columnWidth={CARD_WIDTH + GAP}
-              height={GRID_HEIGHT}
-              rowCount={rowCount}
-              rowHeight={CARD_HEIGHT + GAP}
-              width={Math.min((CARD_WIDTH + GAP) * COLUMNS, screenWidth - 20)}
-            >
-              {({ columnIndex, rowIndex, style }) => {
-                const idx = rowIndex * COLUMNS + columnIndex;
-                const word = filteredWords[idx];
-
-                if (!word) return null;
-
-                return (
-                  <div style={style} className="px-1 sm:px-2">
-                    <WordCard
-                      word={word}
-                      isKnown={knownWordIds.includes(word.id)}
-                      onMarkKnown={markAsKnown}
-                      onUnmarkKnown={unmarkKnown}
-                      mode={mode}
-                      note={notes[word.id]}
-                      onOpenNoteModal={(w) => {
-                        setSelectedWord(w);
-                        setNoteModalOpen(true);
-                      }}
-                    />
-                  </div>
-                );
-              }}
-            </Grid>
+                  return (
+                    <div style={style} className="px-1 sm:px-2">
+                      <WordCard
+                        word={word}
+                        isKnown={knownWordIds.includes(word.id)}
+                        onMarkKnown={markAsKnown}
+                        onUnmarkKnown={unmarkKnown}
+                        mode={mode}
+                        note={notes[word.id]}
+                        onOpenNoteModal={(w) => {
+                          setSelectedWord(w);
+                          setNoteModalOpen(true);
+                        }}
+                      />
+                    </div>
+                  );
+                }}
+              </Grid>
+            </div>
           </div>
         </div>
       </div>
@@ -419,6 +424,30 @@ export default function WordListPage({
           onClose={() => setNoteModalOpen(false)}
         />
       )}
+
+      <style jsx>{`
+        @keyframes blob {
+          0%,
+          100% {
+            transform: translate(0px, 0px) scale(1);
+          }
+          33% {
+            transform: translate(30px, -50px) scale(1.1);
+          }
+          66% {
+            transform: translate(-20px, 20px) scale(0.9);
+          }
+        }
+        .animate-blob {
+          animation: blob 7s infinite;
+        }
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
+      `}</style>
     </div>
   );
 }

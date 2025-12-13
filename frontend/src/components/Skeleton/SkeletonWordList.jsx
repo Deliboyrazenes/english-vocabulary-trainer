@@ -1,5 +1,3 @@
-// src/components/Skeleton/SkeletonWordList.jsx
-
 import "../../styles/animations.css";
 
 export default function SkeletonWordList() {

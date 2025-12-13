@@ -4,7 +4,7 @@ export default function FilterBar({ level, type, search, onFilterChange }) {
   return (
     <div
       className="
-      bg-white/10 backdrop-blur-md rounded-2xl
+      bg-white/5 backdrop-blur-md rounded-2xl sm:rounded-3xl
       p-4 sm:p-5 md:p-6
       shadow-xl mb-4 sm:mb-6
       border border-white/20
@@ -24,8 +24,9 @@ export default function FilterBar({ level, type, search, onFilterChange }) {
             <label
               className="
               absolute -top-2 left-3
-              text-[10px] sm:text-xs font-semibold text-white
-              bg-indigo-600 px-2 py-0.5 rounded-full z-10
+              text-[10px] sm:text-xs font-black text-white
+              bg-gradient-to-r from-purple-500 to-fuchsia-500 px-2.5 py-0.5 rounded-full z-10
+              shadow-lg
             "
             >
               📊 Level
@@ -37,10 +38,11 @@ export default function FilterBar({ level, type, search, onFilterChange }) {
               className="
                 w-full px-3 sm:px-4 py-2.5 sm:py-3 pt-4
                 rounded-xl border-2 border-white/30
-                bg-white/95 text-gray-700 font-medium text-sm sm:text-base
-                focus:outline-none focus:ring-2 focus:ring-indigo-400
-                hover:border-indigo-300 transition-all duration-200
-                shadow-sm hover:shadow-md
+                bg-white/95 backdrop-blur-sm text-gray-800 font-bold text-sm sm:text-base
+                focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400
+                hover:border-purple-300 transition-all duration-200
+                shadow-md hover:shadow-xl
+                hover:scale-[1.02]
               "
             >
               <option value="all">All Levels</option>
@@ -57,8 +59,9 @@ export default function FilterBar({ level, type, search, onFilterChange }) {
             <label
               className="
               absolute -top-2 left-3
-              text-[10px] sm:text-xs font-semibold text-white
-              bg-purple-600 px-2 py-0.5 rounded-full z-10
+              text-[10px] sm:text-xs font-black text-white
+              bg-gradient-to-r from-yellow-400 to-orange-500 px-2.5 py-0.5 rounded-full z-10
+              shadow-lg
             "
             >
               🏷️ Type
@@ -70,10 +73,11 @@ export default function FilterBar({ level, type, search, onFilterChange }) {
               className="
                 w-full px-3 sm:px-4 py-2.5 sm:py-3 pt-4
                 rounded-xl border-2 border-white/30
-                bg-white/95 text-gray-700 font-medium text-sm sm:text-base
-                focus:outline-none focus:ring-2 focus:ring-purple-400
-                hover:border-purple-300 transition-all duration-200
-                shadow-sm hover:shadow-md
+                bg-white/95 backdrop-blur-sm text-gray-800 font-bold text-sm sm:text-base
+                focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400
+                hover:border-orange-300 transition-all duration-200
+                shadow-md hover:shadow-xl
+                hover:scale-[1.02]
               "
             >
               <option value="all">All Types</option>
@@ -90,8 +94,9 @@ export default function FilterBar({ level, type, search, onFilterChange }) {
           <label
             className="
             absolute -top-2 left-3
-            text-[10px] sm:text-xs font-semibold text-white
-            bg-pink-600 px-2 py-0.5 rounded-full z-10
+            text-[10px] sm:text-xs font-black text-white
+            bg-gradient-to-r from-pink-500 to-rose-500 px-2.5 py-0.5 rounded-full z-10
+            shadow-lg
           "
           >
             🔍 Search
@@ -102,7 +107,7 @@ export default function FilterBar({ level, type, search, onFilterChange }) {
             className="
             absolute left-3 sm:left-4
             top-1/2 transform -translate-y-1/2 mt-1
-            text-gray-400 group-hover:text-indigo-500
+            text-gray-400 group-hover:text-pink-500
             transition-colors duration-200
           "
           >
@@ -129,11 +134,12 @@ export default function FilterBar({ level, type, search, onFilterChange }) {
             className="
               w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 pt-4
               rounded-xl border-2 border-white/30 
-              bg-white/95 text-gray-700 placeholder-gray-400
-              text-sm sm:text-base font-medium
-              focus:outline-none focus:ring-2 focus:ring-pink-400
+              bg-white/95 backdrop-blur-sm text-gray-800 placeholder-gray-400
+              text-sm sm:text-base font-bold
+              focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-400
               hover:border-pink-300 transition-all duration-200
-              shadow-sm hover:shadow-md
+              shadow-md hover:shadow-xl
+              hover:scale-[1.02]
             "
           />
 
@@ -142,10 +148,12 @@ export default function FilterBar({ level, type, search, onFilterChange }) {
               onClick={() => onFilterChange("search", "")}
               className="
                 absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 mt-1
-                bg-gray-200 hover:bg-gray-300 text-gray-600
-                rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center
+                bg-gradient-to-r from-gray-200 to-gray-300 hover:from-gray-300 hover:to-gray-400 
+                text-gray-700
+                rounded-full w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center
                 transition-all duration-200 hover:scale-110 active:scale-95
-                text-xs sm:text-sm
+                text-sm sm:text-base font-bold
+                shadow-md
               "
             >
               ×
@@ -154,23 +162,23 @@ export default function FilterBar({ level, type, search, onFilterChange }) {
         </div>
       </div>
 
-      {/* Active Filters */}
+      {/* Active Filters - Modern badges */}
       {(level !== "all" || type !== "all" || search) && (
-        <div className="mt-3 flex items-center gap-2 flex-wrap text-xs sm:text-sm">
-          <span className="text-white/70 font-medium">Active filters:</span>
+        <div className="mt-4 flex items-center gap-2 flex-wrap text-xs sm:text-sm">
+          <span className="text-white/80 font-bold">Active filters:</span>
           <div className="flex gap-2 flex-wrap">
             {level !== "all" && (
-              <span className="bg-indigo-500/80 text-white px-3 py-1 rounded-full font-semibold">
+              <span className="bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white px-3 py-1.5 rounded-full font-black shadow-lg">
                 {level}
               </span>
             )}
             {type !== "all" && (
-              <span className="bg-purple-500/80 text-white px-3 py-1 rounded-full font-semibold">
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1.5 rounded-full font-black shadow-lg">
                 {type}
               </span>
             )}
             {search && (
-              <span className="bg-pink-500/80 text-white px-3 py-1 rounded-full font-semibold">
+              <span className="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-3 py-1.5 rounded-full font-black shadow-lg">
                 "{search}"
               </span>
             )}
