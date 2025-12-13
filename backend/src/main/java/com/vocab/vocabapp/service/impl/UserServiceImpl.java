@@ -20,14 +20,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User register(User user) {
-        // Email kontrolü
+
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new RuntimeException("Bu email zaten kayıtlı!");
         }
 
-        // Şifreyi hashle
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        
+
         return userRepository.save(user);
     }
 
@@ -37,8 +36,7 @@ public class UserServiceImpl implements UserService {
 
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            
-            // Şifre kontrolü
+
             if (passwordEncoder.matches(password, user.getPassword())) {
                 return Optional.of(user);
             }

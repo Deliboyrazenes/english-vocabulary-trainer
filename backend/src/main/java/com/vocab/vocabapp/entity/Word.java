@@ -5,7 +5,7 @@ import lombok.*;
 
 @Entity
 @Table(name = "words")
-@Data // Lombok -> Getter, Setter, ToString
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -16,14 +16,14 @@ public class Word {
     private Long id;
 
     @Column(nullable = false)
-    private String en;   // English word
+    private String en;
 
     @Column(nullable = false)
-    private String tr;   // Turkish meaning
+    private String tr;
 
     @Column(nullable = false)
-    private String type; // noun, verb, adjective...
+    private String type;
 
     @Column(nullable = false)
-    private String level; // A1, A2, B1, B2, C1
+    private String level;
 }

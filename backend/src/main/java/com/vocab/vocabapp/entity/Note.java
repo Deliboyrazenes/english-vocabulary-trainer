@@ -1,13 +1,22 @@
 package com.vocab.vocabapp.entity;
 
-import jakarta.persistence.*;
-import lombok.Data;
 import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.Data;
 
 @Data
 @Entity
 @Table(name = "notes", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"user_id", "word_id"})
+    @UniqueConstraint(columnNames = {"user_id", "word_id"})
 })
 public class Note {
 
@@ -15,17 +24,14 @@ public class Note {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Not yazan kullanıcı
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // Bu nota bağlı kelime
     @ManyToOne
     @JoinColumn(name = "word_id", nullable = false)
     private Word word;
 
-    // Not içeriği
     @Column(columnDefinition = "TEXT")
     private String text;
 

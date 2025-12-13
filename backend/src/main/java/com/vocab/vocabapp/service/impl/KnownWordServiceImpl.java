@@ -1,5 +1,14 @@
 package com.vocab.vocabapp.service.impl;
 
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.vocab.vocabapp.entity.KnownWord;
 import com.vocab.vocabapp.entity.User;
 import com.vocab.vocabapp.entity.Word;
@@ -7,15 +16,6 @@ import com.vocab.vocabapp.repository.KnownWordRepository;
 import com.vocab.vocabapp.repository.UserRepository;
 import com.vocab.vocabapp.repository.WordRepository;
 import com.vocab.vocabapp.service.KnownWordService;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class KnownWordServiceImpl implements KnownWordService {
@@ -25,8 +25,8 @@ public class KnownWordServiceImpl implements KnownWordService {
     private final WordRepository wordRepository;
 
     public KnownWordServiceImpl(KnownWordRepository knownWordRepository,
-                                UserRepository userRepository,
-                                WordRepository wordRepository) {
+            UserRepository userRepository,
+            WordRepository wordRepository) {
         this.knownWordRepository = knownWordRepository;
         this.userRepository = userRepository;
         this.wordRepository = wordRepository;
@@ -71,8 +71,6 @@ public class KnownWordServiceImpl implements KnownWordService {
     public List<KnownWord> listKnownByUser(Long userId) {
         return knownWordRepository.findByUserId(userId);
     }
-
-
 
     @Override
     public Map<String, Object> getStats(Long userId) {
@@ -150,6 +148,5 @@ public class KnownWordServiceImpl implements KnownWordService {
 
         return result;
     }
-
 
 }

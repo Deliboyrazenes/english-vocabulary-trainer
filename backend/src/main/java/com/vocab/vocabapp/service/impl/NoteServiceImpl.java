@@ -31,7 +31,6 @@ public class NoteServiceImpl implements NoteService {
         Word word = wordRepository.findById(wordId)
                 .orElseThrow(() -> new RuntimeException("Kelime bulunamadı"));
 
-        // Not zaten var mı?
         Note note = noteRepository.findByUserIdAndWordId(userId, wordId)
                 .orElse(new Note());
 
@@ -40,8 +39,9 @@ public class NoteServiceImpl implements NoteService {
         note.setText(text);
         note.setUpdatedAt(LocalDateTime.now());
 
-        if (note.getCreatedAt() == null)
+        if (note.getCreatedAt() == null) {
             note.setCreatedAt(LocalDateTime.now());
+        }
 
         return noteRepository.save(note);
     }

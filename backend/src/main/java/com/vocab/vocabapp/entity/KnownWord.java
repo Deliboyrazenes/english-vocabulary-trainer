@@ -2,7 +2,6 @@ package com.vocab.vocabapp.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.Instant;
 import java.time.LocalDate;
 
 @Entity
@@ -30,7 +29,6 @@ public class KnownWord {
 
     @Column(nullable = false, updatable = false)
     private LocalDate knownAt;
-
 
     @PrePersist
     public void prePersist() {
