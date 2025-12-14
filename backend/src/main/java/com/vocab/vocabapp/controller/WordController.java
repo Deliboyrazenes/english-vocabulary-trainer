@@ -3,7 +3,7 @@ package com.vocab.vocabapp.controller;
 import com.vocab.vocabapp.entity.Word;
 import com.vocab.vocabapp.service.WordService;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 @RestController
@@ -16,10 +16,9 @@ public class WordController {
         this.wordService = wordService;
     }
 
-    // 1️⃣ Tüm kelimeleri getir
     @GetMapping
-    public List<Word> getAllWords() {
-        return wordService.getAllWords();
+    public List<Word> getAllWords(@RequestParam(required = false) Integer limit) {
+        return wordService.getAllWords(limit);
     }
 
     // 2️⃣ Yeni kelime ekle
