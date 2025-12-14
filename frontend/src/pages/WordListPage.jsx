@@ -50,15 +50,17 @@ export default function WordListPage({
 
   /* ------------------------ LOAD DATA ------------------------ */
   useEffect(() => {
-    const load = async () => {
+    let cancelled = false;
+
+    const loadMeta = async () => {
       try {
-        const [wordsRes, knownRes, notesRes] = await Promise.all([
-          api.get("/words"),
+        const [knownRes, notesRes] = await Promise.all([
           api.get("/known-words"),
           api.get("/notes/by-user"),
         ]);
 
-        setWords(wordsRes.data);
+        if (cancelled) return;
+
         setKnownWordIds(knownRes.data.map((item) => item.word.id));
 
         const map = {};
@@ -68,12 +70,45 @@ export default function WordListPage({
         setNotes(map);
       } catch (err) {
         console.error(err);
+      }
+    };
+
+    const loadAllWords = async () => {
+      try {
+        const allRes = await api.get("/words"); // TÜM kelimeler
+        if (cancelled) return;
+        setWords(allRes.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    const loadInitial = async () => {
+      try {
+        setLoading(true);
+
+        // 🔥 1️⃣ İlk 300 kelime
+        const firstRes = await api.get("/words?limit=300");
+        if (cancelled) return;
+
+        setWords(firstRes.data);
+        setLoading(false);
+
+        // 🔥 2️⃣ Arkadan yüklenenler
+        loadMeta();
+        loadAllWords();
+      } catch (err) {
+        console.error(err);
         setError("Backend bağlantı hatası");
-      } finally {
         setLoading(false);
       }
     };
-    load();
+
+    loadInitial();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   /* ------------------ MARK KNOWN / UNMARK ------------------ */
@@ -251,7 +286,7 @@ export default function WordListPage({
                 className="group relative px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-xl bg-white/10 backdrop-blur-sm border-2 border-white/20 hover:bg-white/20 hover:border-white/40 transition-all hover:scale-105 font-bold text-xs sm:text-sm flex items-center gap-2 shadow-lg"
               >
                 <span className="text-lg sm:text-xl">📝</span>
-                <span className="hidden sm:inline">Notlarım</span>
+                <span className="hidden sm:inline">Notlarım</span>f
               </button>
 
               {/* Profile Button */}
