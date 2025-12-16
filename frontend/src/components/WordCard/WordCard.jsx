@@ -21,6 +21,7 @@ export default function WordCard({
   mode,
   note,
   onOpenNoteModal,
+  onOpenAIModal,
 }) {
   const [flipped, setFlipped] = useState(false);
   const [pressed, setPressed] = useState(false);
@@ -117,6 +118,16 @@ export default function WordCard({
               {word.level}
             </span>
           </div>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenAIModal(word);
+            }}
+            className="w-full mt-3 px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 rounded-xl font-bold text-white transition-all hover:scale-105 flex items-center justify-center gap-2 shadow-lg text-sm"
+          >
+            <span className="text-base">✨</span>
+            AI Örnek Cümle
+          </button>
         </div>
 
         {/* BACK */}

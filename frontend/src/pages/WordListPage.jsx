@@ -7,6 +7,7 @@ import WordCard from "../components/WordCard/WordCard";
 import GlobalNoteModal from "../components/NoteModal/GlobalNoteModal";
 import QuizSetupModal from "../components/Quiz/QuizSetupModal";
 import SkeletonWordList from "../components/Skeleton/SkeletonWordList";
+import AIExampleModal from "../components/AIModal/AIExampleModal";
 
 import { FixedSizeGrid as Grid } from "react-window";
 
@@ -47,6 +48,9 @@ export default function WordListPage({
   const [showKnown, setShowKnown] = useState(false);
 
   const [showQuizSetup, setShowQuizSetup] = useState(false);
+
+  const [aiModalOpen, setAiModalOpen] = useState(false);
+  const [selectedAIWord, setSelectedAIWord] = useState(null);
 
   /* ------------------------ LOAD DATA ------------------------ */
   useEffect(() => {
@@ -286,7 +290,7 @@ export default function WordListPage({
                 className="group relative px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-xl bg-white/10 backdrop-blur-sm border-2 border-white/20 hover:bg-white/20 hover:border-white/40 transition-all hover:scale-105 font-bold text-xs sm:text-sm flex items-center gap-2 shadow-lg"
               >
                 <span className="text-lg sm:text-xl">📝</span>
-                <span className="hidden sm:inline">Notlarım</span>f
+                <span className="hidden sm:inline">Notlarım</span>
               </button>
 
               {/* Profile Button */}
@@ -431,6 +435,10 @@ export default function WordListPage({
                           setSelectedWord(w);
                           setNoteModalOpen(true);
                         }}
+                        onOpenAIModal={(w) => {
+                          setSelectedAIWord(w);
+                          setAiModalOpen(true);
+                        }}
                       />
                     </div>
                   );
@@ -457,6 +465,25 @@ export default function WordListPage({
           onSaveNote={handleSaveNote}
           onDeleteNote={handleDeleteNote}
           onClose={() => setNoteModalOpen(false)}
+        />
+      )}
+
+      {/* AI MODAL */}
+      {aiModalOpen && selectedAIWord && (
+        <AIExampleModal
+          key={selectedAIWord.id}
+          word={selectedAIWord}
+          isOpen={aiModalOpen}
+          onClose={() => {
+            setAiModalOpen(false);
+            setSelectedAIWord(null);
+          }}
+          onSaved={(wordId, text) => {
+            setNotes((prev) => ({
+              ...prev,
+              [wordId]: text,
+            }));
+          }}
         />
       )}
 
