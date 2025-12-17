@@ -41,7 +41,8 @@ public class SecurityConfig {
                 .requestMatchers(
                         "/users/login",
                         "/users/register",
-                        "/test/**"
+                        "/test/**",
+                        "/ai/**"
                 ).permitAll()
                 .anyRequest().authenticated()
                 )
@@ -77,7 +78,7 @@ public class SecurityConfig {
 
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
-        corsConfiguration.setAllowCredentials(true);
+        corsConfiguration.setAllowCredentials(false);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration);
