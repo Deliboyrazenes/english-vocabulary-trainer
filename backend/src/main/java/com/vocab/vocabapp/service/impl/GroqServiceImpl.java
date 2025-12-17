@@ -3,7 +3,6 @@ package com.vocab.vocabapp.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vocab.vocabapp.dto.AIExampleResponse;
-import com.vocab.vocabapp.repository.UserRepository;
 import com.vocab.vocabapp.service.AiUsageService;
 import com.vocab.vocabapp.service.GroqService;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -32,29 +30,22 @@ public class GroqServiceImpl implements GroqService {
             = "https://api.groq.com/openai/v1/chat/completions";
 
     private final AiUsageService aiUsageService;
-    private final UserRepository userRepository;
 
     @Override
-    public AIExampleResponse generateExampleSentence(String word) {
+    public AIExampleResponse generateExampleSentence(String word, Long userId) {
 
+        // 🔐 API key kontrolü
         if (apiKey == null || apiKey.isEmpty()) {
             logger.warn("Groq API key not configured");
-            return buildError("API key not configured", "API anahtarı yapılandırılmamış");
+            return buildError(
+                    "API key not configured",
+                    "API anahtarı yapılandırılmamış"
+            );
         }
 
-        /* ================= USER & LIMIT ================= */
-        String email = SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getName();
-
-        Long userId = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("USER_NOT_FOUND"))
-                .getId();
-
-        // 🔥 günlük limitten 1 düş, kalan hakkı al
+        // 🔥 GÜNLÜK LİMİT (ARTIK AUTH İLE KARIŞMIYOR)
         int remainingToday = aiUsageService.useOneAndGetRemaining(userId);
 
-        /* ================= AI REQUEST ================= */
         RestTemplate restTemplate = new RestTemplate();
         ObjectMapper mapper = new ObjectMapper();
 
@@ -75,7 +66,7 @@ STRICT RULES:
 Then translate the sentence into Turkish.
 
 - Turkish translation MUST be pure Turkish.
-- Do NOT include any foreign words or accents (Spanish, Vietnamese, etc).
+- Do NOT include any foreign words or accents.
 - Use standard daily Turkish only.
 
 Respond ONLY in this format:
@@ -139,7 +130,6 @@ CONTEXT: [idea in 2–3 words]
             String word,
             int remainingToday
     ) {
-
         String english = "";
         String turkish = "";
         String context = "General Usage";
@@ -150,7 +140,8 @@ CONTEXT: [idea in 2–3 words]
                 english = line.substring("ENGLISH:".length()).trim();
             } else if (line.startsWith("TURKISH:")) {
                 turkish = cleanTurkish(
-                        line.substring("TURKISH:".length()).trim());
+                        line.substring("TURKISH:".length()).trim()
+                );
             } else if (line.startsWith("CONTEXT:")) {
                 context = line.substring("CONTEXT:".length()).trim();
             }

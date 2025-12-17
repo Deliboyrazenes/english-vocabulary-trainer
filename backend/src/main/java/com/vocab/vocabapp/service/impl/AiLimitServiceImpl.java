@@ -9,10 +9,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AiLimitServiceImpl implements AiLimitService {
 
-    // Groq free havuzu: örnek. İstersen 14400 yerine 12000 gibi güvenli buffer koyarız.
     private static final int GLOBAL_DAILY_LIMIT = 14000;
 
-    // kişi başına alt/üst sınır (ürün kararı)
     private static final int MIN_LIMIT = 5;
     private static final int MAX_LIMIT = 100;
 
@@ -27,7 +25,6 @@ public class AiLimitServiceImpl implements AiLimitService {
 
         int calculated = (int) (GLOBAL_DAILY_LIMIT / userCount);
 
-        // clamp(min,max)
         if (calculated < MIN_LIMIT) {
             return MIN_LIMIT;
         }

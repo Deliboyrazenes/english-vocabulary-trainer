@@ -4,5 +4,6 @@ import com.vocab.vocabapp.dto.AIExampleResponse;
 
 public interface GroqService {
 
-    AIExampleResponse generateExampleSentence(String word);
+    AIExampleResponse generateExampleSentence(String word, Long userId);
+
 }

@@ -25,18 +25,15 @@ public class AiUsageServiceImpl implements AiUsageService {
         DailyAiUsage usage = repository.findById(userId)
                 .orElseGet(() -> new DailyAiUsage(userId, today, 0));
 
-        // Gün değişmişse reset
         if (!usage.getUsageDate().equals(today)) {
             usage.setUsageDate(today);
             usage.setUsedCount(0);
         }
 
-        // Limit kontrol
         if (usage.getUsedCount() >= dailyLimit) {
             throw new RuntimeException("AI_LIMIT_REACHED");
         }
 
-        // 1 hak düş
         usage.setUsedCount(usage.getUsedCount() + 1);
         repository.save(usage);
 
