@@ -40,9 +40,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                         "/users/login",
-                        "/users/register",
-                        "/import/**",
-                        "/words/**"
+                        "/users/register"
                 ).permitAll()
                 .anyRequest().authenticated()
                 )

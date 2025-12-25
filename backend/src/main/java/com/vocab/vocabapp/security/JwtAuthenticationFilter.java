@@ -26,16 +26,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        String path = request.getRequestURI();
-        // Public endpoint'ler için JWT kontrolünü atla
-        return path.startsWith("/import/") || 
-               path.startsWith("/users/login") || 
-               path.startsWith("/users/register") ||
-               path.startsWith("/words/");
-    }
-
-    @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
@@ -44,13 +34,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
 
-        // HEADER YOK veya Bearer ile başlamıyor → devam et
+        
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        final String token = authHeader.substring(7); // "Bearer " sonrası
+        final String token = authHeader.substring(7); 
         final String userEmail;
 
         try {
@@ -60,7 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Kullanıcı zaten authenticated ise tekrar yapma
+        
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
