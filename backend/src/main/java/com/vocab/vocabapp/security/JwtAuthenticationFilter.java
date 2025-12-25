@@ -26,6 +26,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getRequestURI();
+        // Public endpoint'ler için JWT kontrolünü atla
+        return path.startsWith("/import/") || 
+               path.startsWith("/users/login") || 
+               path.startsWith("/users/register") ||
+               path.startsWith("/words/");
+    }
+
+    @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
