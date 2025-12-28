@@ -14,8 +14,14 @@ export default function QuizSetupModal({
     if (isOpen) {
       setQuizType("mcq-en-tr");
       setQuestionCount(Math.min(10, maxQuestions));
-      setWordSource("unknown");
+      setWordSource("unknown");  
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
     }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
   }, [isOpen, maxQuestions]);
 
   if (!isOpen) return null;
@@ -80,7 +86,6 @@ export default function QuizSetupModal({
           w-full max-w-4xl
           rounded-3xl shadow-2xl relative overflow-hidden
           animate-in zoom-in-95 duration-300
-          max-h-[90vh] overflow-y-auto
           p-6 sm:p-8
         "
       >

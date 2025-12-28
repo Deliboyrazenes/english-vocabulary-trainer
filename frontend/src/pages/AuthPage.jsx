@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import api from "../services/axios";
 import SkeletonAuth from "../components/Skeleton/SkeletonAuth";
+import toast from "react-hot-toast";
 
 export default function AuthPage({ onLoginSuccess, onBackToHome }) {
   const [email, setEmail] = useState("");
@@ -69,13 +70,19 @@ export default function AuthPage({ onLoginSuccess, onBackToHome }) {
 
     if (!email.trim() || !password.trim()) {
       setMessage("❌ Lütfen email ve şifre alanlarını doldurun.");
+      toast.error("Lütfen email ve şifre alanlarını doldurun.");
       return;
     }
 
     if (isRegister && !name.trim()) {
       setMessage("❌ Lütfen ad soyad alanını doldurun.");
+      toast.error("Lütfen ad soyad alanını doldurun.");
       return;
     }
+
+    const loadingToast = toast.loading(
+      isRegister ? "Hesap oluşturuluyor..." : "Giriş yapılıyor..."
+    );
 
     try {
       if (isRegister) {
@@ -85,6 +92,8 @@ export default function AuthPage({ onLoginSuccess, onBackToHome }) {
           password,
         });
 
+        toast.dismiss(loadingToast);
+        toast.success("Kayıt başarılı! Şimdi giriş yapabilirsiniz.");
         setMessage("✅ Kayıt başarılı! Şimdi giriş yapabilirsiniz.");
         setIsRegister(false);
         setEmail("");
@@ -101,6 +110,8 @@ export default function AuthPage({ onLoginSuccess, onBackToHome }) {
       const user = response.data;
 
       if (!user || !user.token) {
+        toast.dismiss(loadingToast);
+        toast.error("Giriş başarısız. Bilgileri kontrol edin.");
         setMessage("❌ Giriş başarısız. Bilgileri kontrol edin.");
         return;
       }
@@ -120,9 +131,18 @@ export default function AuthPage({ onLoginSuccess, onBackToHome }) {
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("screen", "words");
 
-      onLoginSuccess(user);
+      toast.dismiss(loadingToast);
+      toast.success("Giriş başarılı! Yönlendiriliyorsunuz...", {
+        duration: 2000,
+      });
+      
+      setTimeout(() => {
+        onLoginSuccess(user);
+      }, 800);
     } catch (err) {
       console.error("AUTH ERROR:", err);
+      toast.dismiss(loadingToast);
+      toast.error("Email veya şifre hatalı.");
       setMessage("❌ Email veya şifre hatalı.");
     }
   };

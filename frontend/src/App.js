@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 
 import { Toaster } from "react-hot-toast";
+import { toastConfig } from "./config/toastConfig";
 import HomePage from "./pages/HomePage";
 import AuthPage from "./pages/AuthPage";
 import WordListPage from "./pages/WordListPage";
 import ProfilePage from "./pages/ProfilePage";
 import QuizPage from "./pages/QuizPage";
-import GlobalNotesPage from "./pages/GlobalNotesPage"; 
+import GlobalNotesPage from "./pages/GlobalNotesPage";
 
 function App() {
 
@@ -75,33 +76,27 @@ function App() {
     }
 
     return (
-      <AuthPage
-        onLoginSuccess={handleLoginSuccess}
-        onBackToHome={() => setScreen("home")}
-      />
+      <>
+        <Toaster {...toastConfig} />
+        <AuthPage
+          onLoginSuccess={handleLoginSuccess}
+          onBackToHome={() => setScreen("home")}
+        />
+      </>
     );
   }
 
   return (
     <>
-    
-    <Toaster
-      position="top-right"
-      toastOptions={{
-        duration: 3000,
-        style: {
-          background: "#1f2937",
-          color: "#fff",
-        },
-      }}
-    />
+
+      <Toaster {...toastConfig} />
 
       {screen === "words" && (
         <WordListPage
           user={user}
           onLogout={handleLogout}
           onOpenProfile={goToProfile}
-          onOpenNotes={goToNotes} 
+          onOpenNotes={goToNotes}
           onStartQuiz={goToQuiz}
         />
       )}

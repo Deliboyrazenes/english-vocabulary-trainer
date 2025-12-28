@@ -35,45 +35,57 @@ function levenshtein(a, b) {
 }
 
 function evaluateAnswer(userAnswer, correctAnswer) {
-  const user = normalize(userAnswer);
-  const correct = normalize(correctAnswer);
+  const userNorm = normalize(userAnswer);
 
   // komple boş ise yanlış
-  if (!user) return { status: "wrong", correctAnswer, empty: true };
+  if (!userNorm) return { status: "wrong", correctAnswer, empty: true };
 
-  // birebir doğru
-  if (user === correct) return { status: "perfect", correctAnswer };
+  // Virgül veya noktalı virgülle ayrılmış seçenekleri ayır
+  const possibleAnswers = correctAnswer
+    .split(/[;,]/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
 
-  const dist = levenshtein(user, correct);
+  // Her bir olası cevabı kontrol et
+  for (let ans of possibleAnswers) {
+    const targetNorm = normalize(ans);
 
-  // kısa kelimelerde ( ≤ 4 ) → max 2 fark
-  if (correct.length <= 4 && dist <= 2) {
-    return { status: "typo-ok", correctAnswer };
-  }
+    // birebir doğru
+    if (userNorm === targetNorm) {
+      return { status: "perfect", correctAnswer };
+    }
 
-  // orta kelimelerde (5–7 harf) → max 3 fark
-  if (correct.length <= 7 && dist <= 3) {
-    return { status: "typo-ok", correctAnswer };
-  }
+    const dist = levenshtein(userNorm, targetNorm);
 
-  // uzun kelimelerde → max 4 fark
-  if (correct.length >= 8 && dist <= 4) {
-    return { status: "typo-ok", correctAnswer };
-  }
+    // kısa kelimelerde ( ≤ 4 ) → max 2 fark
+    if (targetNorm.length <= 4 && dist <= 2) {
+      return { status: "typo-ok", correctAnswer };
+    }
 
-  // Özel durum: tekrar harf (kötüüü / köttüü / barrış)
-  if (/(.)\1{1,}/.test(userAnswer)) {
-    if (dist <= 3) return { status: "typo-ok", correctAnswer };
-  }
+    // orta kelimelerde (5–7 harf) → max 3 fark
+    if (targetNorm.length <= 7 && dist <= 3) {
+      return { status: "typo-ok", correctAnswer };
+    }
 
-  // Başında fazladan harf → "kkötü", "bbari̇s"
-  if (user.length > correct.length && user.startsWith(correct[0])) {
-    if (dist <= 3) return { status: "typo-ok", correctAnswer };
-  }
+    // uzun kelimelerde → max 4 fark
+    if (targetNorm.length >= 8 && dist <= 4) {
+      return { status: "typo-ok", correctAnswer };
+    }
 
-  // Ortada fazlalık (baarrış)
-  if (user.includes(correct)) {
-    return { status: "typo-ok", correctAnswer };
+    // Özel durum: tekrar harf (kötüüü / köttüü / barrış)
+    if (/(.)\1{1,}/.test(userAnswer)) {
+      if (dist <= 3) return { status: "typo-ok", correctAnswer };
+    }
+
+    // Başında fazladan harf → "kkötü", "bbariş"
+    if (userNorm.length > targetNorm.length && userNorm.startsWith(targetNorm[0])) {
+      if (dist <= 3) return { status: "typo-ok", correctAnswer };
+    }
+
+    // Ortada fazlalık (baarrış)
+    if (userNorm.includes(targetNorm)) {
+      return { status: "typo-ok", correctAnswer };
+    }
   }
 
   return { status: "wrong", correctAnswer };

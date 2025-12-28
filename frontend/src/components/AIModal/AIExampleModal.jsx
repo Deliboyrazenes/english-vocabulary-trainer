@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import api from "../../services/axios";
 import toast from "react-hot-toast";
 
@@ -16,6 +16,18 @@ export default function AIExampleModal({ word, isOpen, onClose, onSaved }) {
   const [loading, setLoading] = useState(false);
   const [example, setExample] = useState(null);
   const [error, setError] = useState("");
+
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
 
   const generateExample = async () => {
     setLoading(true);
@@ -55,9 +67,11 @@ export default function AIExampleModal({ word, isOpen, onClose, onSaved }) {
     }
   };
 
-  const speak = (text, lang = "en-US") => {
+  const speak = (text) => {
+    speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = lang;
+    utterance.lang = "en-US";
+    utterance.rate = 0.9;
     speechSynthesis.speak(utterance);
   };
 
@@ -74,22 +88,18 @@ export default function AIExampleModal({ word, isOpen, onClose, onSaved }) {
     }[typeKey] || "from-gray-400 to-gray-600";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-gradient-to-br from-purple-900 via-fuchsia-900 to-pink-900 rounded-3xl shadow-2xl max-w-2xl w-full border-2 border-white/20 max-h-[90vh] overflow-y-auto animate-scaleIn">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn overflow-y-auto">
+      {/* Modal Container: h-auto ve overflow-hidden ile iç scroll'u engelledik */}
+      <div className="bg-gradient-to-br from-purple-900 via-fuchsia-900 to-pink-900 rounded-3xl shadow-2xl max-w-2xl w-full border-2 border-white/20 h-auto overflow-hidden animate-scaleIn my-8">
         {/* Header */}
-        <div className="sticky top-0 bg-purple-900/90 backdrop-blur-md p-6 border-b border-white/10 rounded-t-3xl z-10">
+        <div className="bg-purple-900/90 backdrop-blur-md p-6 border-b border-white/10 rounded-t-3xl">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center text-2xl shadow-lg">
                 ✨
               </div>
-              <div>
-                <h2 className="text-2xl font-bold text-white">
-                  AI Örnek Cümle
-                </h2>
-              </div>
+              <h2 className="text-2xl font-bold text-white">AI Örnek Cümle</h2>
             </div>
-
             <button
               onClick={onClose}
               className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center text-white transition-all hover:scale-110 text-xl"
@@ -98,7 +108,6 @@ export default function AIExampleModal({ word, isOpen, onClose, onSaved }) {
             </button>
           </div>
 
-          {/* Word Display */}
           <div className="p-4 bg-white/5 rounded-2xl border border-white/10">
             <div className="flex items-center justify-between flex-wrap gap-3">
               <div>
@@ -140,9 +149,6 @@ export default function AIExampleModal({ word, isOpen, onClose, onSaved }) {
               <p className="text-white/90 font-semibold text-lg">
                 AI düşünüyor...
               </p>
-              <p className="text-white/50 text-sm mt-2">
-                Bu birkaç saniye sürebilir
-              </p>
             </div>
           )}
 
@@ -161,14 +167,6 @@ export default function AIExampleModal({ word, isOpen, onClose, onSaved }) {
 
           {example && (
             <div className="space-y-6 animate-fadeIn">
-              {/* Context Badge */}
-              <div className="flex justify-center">
-                <div className="px-4 py-2 bg-blue-500/20 border border-blue-400/30 rounded-full text-sm font-semibold text-blue-300">
-                  📚 {example.context}
-                </div>
-              </div>
-
-              {/* English Sentence */}
               <div className="p-5 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-all">
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 bg-blue-500/30 rounded-lg flex items-center justify-center flex-shrink-0 text-lg">
@@ -183,7 +181,7 @@ export default function AIExampleModal({ word, isOpen, onClose, onSaved }) {
                     </p>
                   </div>
                   <button
-                    onClick={() => speak(example.english, "en-US")}
+                    onClick={() => speak(example.english)}
                     className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-xl transition-all hover:scale-110"
                   >
                     🔊
@@ -191,7 +189,6 @@ export default function AIExampleModal({ word, isOpen, onClose, onSaved }) {
                 </div>
               </div>
 
-              {/* Turkish Translation */}
               <div className="p-5 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-all">
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 bg-red-500/30 rounded-lg flex items-center justify-center flex-shrink-0 text-lg">
@@ -205,39 +202,24 @@ export default function AIExampleModal({ word, isOpen, onClose, onSaved }) {
                       {example.turkish}
                     </p>
                   </div>
-                  <button
-                    onClick={() => speak(example.turkish, "tr-TR")}
-                    className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-xl transition-all hover:scale-110"
-                  >
-                    🔊
-                  </button>
                 </div>
               </div>
 
-              {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={generateExample}
                   disabled={example?.remainingToday === 0}
-                  className={`flex-1 px-6 py-3 rounded-xl font-semibold transition-all
-      ${
-        example?.remainingToday === 0
-          ? "bg-gray-500/30 cursor-not-allowed"
-          : "bg-white/10 hover:bg-white/20 hover:scale-105"
-      }`}
+                  className={`flex-1 px-6 py-3 rounded-xl font-semibold transition-all ${
+                    example?.remainingToday === 0
+                      ? "bg-gray-500/30 cursor-not-allowed"
+                      : "bg-white/10 hover:bg-white/20 hover:scale-105"
+                  }`}
                 >
                   🔄 Yeni Örnek
                 </button>
-
                 <button
                   onClick={saveAsNote}
-                  disabled={!example}
-                  className={`flex-1 px-6 py-3 rounded-xl font-semibold text-white transition-all
-      ${
-        !example
-          ? "bg-emerald-500/30 cursor-not-allowed"
-          : "bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 hover:scale-105"
-      }`}
+                  className="flex-1 px-6 py-3 rounded-xl font-semibold text-white transition-all bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 hover:scale-105"
                 >
                   💾 Notlara Kaydet
                 </button>
@@ -250,7 +232,7 @@ export default function AIExampleModal({ word, isOpen, onClose, onSaved }) {
                 </span>
               </div>
 
-              {/* AI Info */}
+              {/* AI Info - Groq Geri Geldi */}
               <div className="p-4 bg-purple-500/10 border border-purple-400/20 rounded-xl">
                 <div className="flex items-center gap-2 text-sm text-purple-200">
                   <span className="text-lg">💡</span>
@@ -263,8 +245,8 @@ export default function AIExampleModal({ word, isOpen, onClose, onSaved }) {
           )}
         </div>
 
-        {/* Footer */}
-        <div className="sticky bottom-0 p-4 border-t border-white/10 bg-purple-900/90 backdrop-blur-md rounded-b-3xl">
+        {/* Footer - Orijinal Hali */}
+        <div className="p-4 border-t border-white/10 bg-purple-900/90 backdrop-blur-md">
           <div className="flex items-center justify-between text-xs text-white/50">
             <span>VocabZone • İngilizce öğrenmenin keyifli yolu ❤️</span>
             <span>🚀 Ücretsiz öğrenme deneyimi</span>
