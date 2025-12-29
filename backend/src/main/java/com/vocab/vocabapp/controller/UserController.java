@@ -46,9 +46,28 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
         try {
-            User saved = userService.register(user);
-            saved.setPassword(null);
-            return ResponseEntity.ok(saved);
+            userService.register(user);
+            return ResponseEntity.ok(Map.of("message", "Kayıt başarılı! Lütfen mail adresinize gelen 6 haneli kodu girerek hesabınızı doğrulayın."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/verify")
+    public ResponseEntity<?> verify(@RequestBody Map<String, String> body) {
+        try {
+            userService.confirmVerification(body.get("email"), body.get("code"));
+            return ResponseEntity.ok(Map.of("message", "Hesap başarıyla doğrulandı. Artık giriş yapabilirsiniz."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/resend-code")
+    public ResponseEntity<?> resendCode(@RequestBody Map<String, String> body) {
+        try {
+            userService.resendVerificationCode(body.get("email"));
+            return ResponseEntity.ok(Map.of("message", "Yeni doğrulama kodu başarıyla gönderildi."));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
@@ -111,6 +130,26 @@ public class UserController {
         try {
             userService.deleteUserWithPassword(userId, req.getPassword());
             return ResponseEntity.ok(Map.of("message", "Kullanıcı silindi."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> body) {
+        try {
+            userService.forgotPassword(body.get("email"));
+            return ResponseEntity.ok(Map.of("message", "Şifre sıfırlama linki mail adresinize gönderildi."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
+        try {
+            userService.resetPassword(body.get("token"), body.get("newPassword"));
+            return ResponseEntity.ok(Map.of("message", "Şifreniz başarıyla sıfırlandı. Yeni şifrenizle giriş yapabilirsiniz."));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }

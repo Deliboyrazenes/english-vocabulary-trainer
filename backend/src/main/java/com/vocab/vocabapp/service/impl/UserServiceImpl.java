@@ -1,12 +1,16 @@
 package com.vocab.vocabapp.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.vocab.vocabapp.entity.User;
 import com.vocab.vocabapp.repository.UserRepository;
+import com.vocab.vocabapp.service.EmailService;
 import com.vocab.vocabapp.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -17,6 +21,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     @Override
     public User register(User user) {
@@ -26,8 +31,19 @@ public class UserServiceImpl implements UserService {
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        
+        // OTP Mantığı
+        String otp = generateOtp();
+        user.setVerificationCode(otp);
+        user.setCodeExpiration(LocalDateTime.now().plusMinutes(5));
+        user.setIsEnabled(false);
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        
+        // Mail Gönder
+        emailService.sendVerificationEmail(savedUser.getEmail(), savedUser.getName(), otp);
+
+        return savedUser;
     }
 
     @Override
@@ -37,12 +53,94 @@ public class UserServiceImpl implements UserService {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
 
+            if (user.getIsEnabled() == null || !user.getIsEnabled()) {
+                throw new RuntimeException("Lütfen önce hesabınızı doğrulayın.");
+            }
+
             if (passwordEncoder.matches(password, user.getPassword())) {
                 return Optional.of(user);
             }
         }
 
         return Optional.empty();
+    }
+
+    @Override
+    public void forgotPassword(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+
+        String token = UUID.randomUUID().toString();
+        user.setPasswordResetToken(token);
+        user.setPasswordResetTokenExpiration(LocalDateTime.now().plusMinutes(15));
+        userRepository.save(user);
+
+        // Frontend URL'ini buradan veriyoruz (Geliştirme için localhost, canlı için senin domainin)
+        String resetLink = "http://localhost:3000/reset-password?token=" + token;
+        // Not: Canlıya çıktığında bu URL'i bir config'e bağlamak daha iyidir.
+        
+        emailService.sendPasswordResetEmail(user.getEmail(), user.getName(), resetLink);
+    }
+
+    @Override
+    public void resetPassword(String token, String newPassword) {
+        User user = userRepository.findByPasswordResetToken(token)
+                .orElseThrow(() -> new RuntimeException("Geçersiz veya süresi dolmuş token!"));
+
+        if (user.getPasswordResetTokenExpiration().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Token süresi dolmuş!");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPasswordResetToken(null);
+        user.setPasswordResetTokenExpiration(null);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void confirmVerification(String email, String code) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+
+        if (user.getIsEnabled() != null && user.getIsEnabled()) {
+            throw new RuntimeException("Hesap zaten doğrulanmış.");
+        }
+
+        if (user.getCodeExpiration().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Kodun süresi dolmuş. Lütfen yeni kod isteyin.");
+        }
+
+        if (!user.getVerificationCode().equals(code)) {
+            throw new RuntimeException("Hatalı doğrulama kodu!");
+        }
+
+        user.setIsEnabled(true);
+        user.setVerificationCode(null);
+        user.setCodeExpiration(null);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void resendVerificationCode(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+
+        if (user.getIsEnabled() != null && user.getIsEnabled()) {
+            throw new RuntimeException("Hesap zaten doğrulanmış.");
+        }
+
+        String otp = generateOtp();
+        user.setVerificationCode(otp);
+        user.setCodeExpiration(LocalDateTime.now().plusMinutes(5));
+        userRepository.save(user);
+
+        emailService.sendVerificationEmail(user.getEmail(), user.getName(), otp);
+    }
+
+    private String generateOtp() {
+        Random random = new Random();
+        int otp = 100000 + random.nextInt(900000);
+        return String.valueOf(otp);
     }
 
     @Override
@@ -59,17 +157,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateProfile(Long userId, String newName) {
+    public void updateProfile(Long userId, String name) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
 
-        user.setName(newName);
+        user.setName(name);
         userRepository.save(user);
     }
 
     @Override
-    public User getById(Long userId) {
-        return userRepository.findById(userId)
+    public User getById(Long id) {
+        return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
     }
 

@@ -10,6 +10,10 @@ public interface UserService {
     void updateProfile(Long userId, String name);
     User getById(Long id);
     void deleteUserWithPassword(Long userId, String password);
-
-
+    
+    // Yeni eklenenler
+    void confirmVerification(String email, String code);
+    void resendVerificationCode(String email);
+    void forgotPassword(String email);
+    void resetPassword(String token, String newPassword);
 }
