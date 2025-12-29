@@ -22,7 +22,6 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/users")
-@CrossOrigin(origins = {"http://localhost:3000", "https://vocab-frontend-bi8w.onrender.com"}, allowCredentials = "true")
 public class UserController {
 
     private final UserService userService;
