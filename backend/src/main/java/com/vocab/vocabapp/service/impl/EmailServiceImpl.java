@@ -24,8 +24,7 @@ public class EmailServiceImpl implements EmailService {
     @org.springframework.beans.factory.annotation.Autowired
     private TemplateEngine templateEngine;
 
-    @Value("${spring.mail.properties.mail.smtp.from:noreply@example.com}")
-    private String fromEmail;
+    private static final String FROM_EMAIL = "delipoyrazenes@gmail.com";
 
     @Override
     public void sendVerificationEmail(String to, String name, String code) {
@@ -44,7 +43,7 @@ public class EmailServiceImpl implements EmailService {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
-            helper.setFrom(fromEmail);
+            helper.setFrom(FROM_EMAIL);
             helper.setTo(to);
             helper.setSubject("VocabZone - Hesabını Doğrula");
             helper.setText(process, true);
@@ -75,7 +74,7 @@ public class EmailServiceImpl implements EmailService {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
-            helper.setFrom(fromEmail);
+            helper.setFrom(FROM_EMAIL);
             helper.setTo(to);
             helper.setSubject("VocabZone - Şifre Sıfırlama");
             helper.setText(process, true);
