@@ -51,9 +51,10 @@ public class EmailServiceImpl implements EmailService {
 
             mailSender.send(mimeMessage);
             log.info("Doğrulama maili başarıyla gönderildi: {}", to);
-        } catch (MessagingException e) {
-            log.error("Mail gönderilirken hata oluştu: ", e);
-            throw new RuntimeException("Mail gönderilemedi.");
+        } catch (Exception e) {
+            log.error("❌ DOĞRULAMA MAİLİ GÖNDERİLEMEDİ! (Muhtemelen SMTP ayarları eksik). Hata: {}", e.getMessage());
+            log.warn("👉 Test için kullanabileceğiniz kod: {}", code);
+            // Kayıt işleminin devam etmesi için exception fırlatmıyoruz
         }
     }
 
@@ -81,9 +82,10 @@ public class EmailServiceImpl implements EmailService {
 
             mailSender.send(mimeMessage);
             log.info("Şifre sıfırlama maili başarıyla gönderildi: {}", to);
-        } catch (MessagingException e) {
-            log.error("Mail gönderilirken hata oluştu: ", e);
-            throw new RuntimeException("Mail gönderilemedi.");
+        } catch (Exception e) {
+            log.error("❌ ŞİFRE SIFIRLAMA MAİLİ GÖNDERİLEMEDİ! Hata: {}", e.getMessage());
+            log.warn("👉 Test için kullanabileceğiniz link: {}", resetLink);
+            // İşlemin devam etmesi için exception fırlatmıyoruz
         }
     }
 }
