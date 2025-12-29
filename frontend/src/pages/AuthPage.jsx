@@ -138,8 +138,9 @@ export default function AuthPage({ onLoginSuccess, onRegisterSuccess, onForgotPa
     } catch (err) {
       console.error("AUTH ERROR:", err);
       toast.dismiss(loadingToast);
-      toast.error("Email veya şifre hatalı.");
-      setMessage("❌ Email veya şifre hatalı.");
+      const errorMessage = err.response?.data?.error || (isRegister ? "Kayıt başarısız." : "Email veya şifre hatalı.");
+      toast.error(errorMessage);
+      setMessage(`❌ ${errorMessage}`);
     }
   };
 
