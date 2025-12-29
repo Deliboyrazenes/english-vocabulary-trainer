@@ -24,7 +24,7 @@ public class EmailServiceImpl implements EmailService {
     @org.springframework.beans.factory.annotation.Autowired
     private TemplateEngine templateEngine;
 
-    @Value("${spring.mail.username:noreply@example.com}")
+    @Value("${spring.mail.properties.mail.smtp.from:noreply@example.com}")
     private String fromEmail;
 
     @Override
