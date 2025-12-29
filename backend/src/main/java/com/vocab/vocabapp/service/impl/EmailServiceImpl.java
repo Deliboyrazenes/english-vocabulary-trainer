@@ -36,7 +36,7 @@ public class EmailServiceImpl implements EmailService {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
-            helper.setFrom(FROM_EMAIL);
+            helper.setFrom(FROM_EMAIL, "VocabZone Destek");
             helper.setTo(to);
             helper.setSubject("VocabZone - Hesabını Doğrula");
             helper.setText(process, true);
@@ -45,8 +45,6 @@ public class EmailServiceImpl implements EmailService {
             log.info("Doğrulama maili başarıyla gönderildi: {}", to);
         } catch (Exception e) {
             log.error("❌ DOĞRULAMA MAİLİ GÖNDERİLEMEDİ! (Muhtemelen SMTP ayarları eksik). Hata: {}", e.getMessage());
-            log.warn("👉 Test için kullanabileceğiniz kod: {}", code);
-            // Kayıt işleminin devam etmesi için exception fırlatmıyoruz
         }
     }
 
@@ -62,7 +60,7 @@ public class EmailServiceImpl implements EmailService {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
-            helper.setFrom(FROM_EMAIL);
+            helper.setFrom(FROM_EMAIL, "VocabZone Güvenlik");
             helper.setTo(to);
             helper.setSubject("VocabZone - Şifre Sıfırlama");
             helper.setText(process, true);
@@ -71,8 +69,6 @@ public class EmailServiceImpl implements EmailService {
             log.info("Şifre sıfırlama maili başarıyla gönderildi: {}", to);
         } catch (Exception e) {
             log.error("❌ ŞİFRE SIFIRLAMA MAİLİ GÖNDERİLEMEDİ! Hata: {}", e.getMessage());
-            log.warn("👉 Test için kullanabileceğiniz link: {}", resetLink);
-            // İşlemin devam etmesi için exception fırlatmıyoruz
         }
     }
 }

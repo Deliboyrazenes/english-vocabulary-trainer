@@ -23,6 +23,9 @@ public class UserServiceImpl implements UserService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final EmailService emailService;
 
+    @org.springframework.beans.factory.annotation.Value("${app.frontend.url:http://localhost:3000}")
+    private String frontendUrl;
+
     @Override
     public User register(User user) {
 
@@ -75,9 +78,7 @@ public class UserServiceImpl implements UserService {
         user.setPasswordResetTokenExpiration(LocalDateTime.now().plusMinutes(15));
         userRepository.save(user);
 
-        // Frontend URL'ini buradan veriyoruz (Geliştirme için localhost, canlı için senin domainin)
-        String resetLink = "http://localhost:3000/reset-password?token=" + token;
-        // Not: Canlıya çıktığında bu URL'i bir config'e bağlamak daha iyidir.
+        String resetLink = frontendUrl + "/reset-password?token=" + token;
         
         emailService.sendPasswordResetEmail(user.getEmail(), user.getName(), resetLink);
     }
