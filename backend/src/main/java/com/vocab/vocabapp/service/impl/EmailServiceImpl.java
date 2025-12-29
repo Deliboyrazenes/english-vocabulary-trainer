@@ -16,23 +16,16 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
 
-    @org.springframework.beans.factory.annotation.Autowired(required = false)
-    private JavaMailSender mailSender;
-
-    @org.springframework.beans.factory.annotation.Autowired
-    private TemplateEngine templateEngine;
+    private final JavaMailSender mailSender;
+    private final TemplateEngine templateEngine;
 
     private static final String FROM_EMAIL = "delipoyrazenes@gmail.com";
 
     @Override
     public void sendVerificationEmail(String to, String name, String code) {
-        if (mailSender == null) {
-            log.warn("JavaMailSender konfigüre edilmemiş! Mail gönderilemedi: {}", to);
-            log.warn("Gönderilmesi gereken kod: {}", code);
-            return;
-        }
         try {
             Context context = new Context();
             context.setVariable("name", name);
@@ -59,11 +52,6 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendPasswordResetEmail(String to, String name, String resetLink) {
-        if (mailSender == null) {
-            log.warn("JavaMailSender konfigüre edilmemiş! Mail gönderilemedi: {}", to);
-            log.warn("Gönderilmesi gereken link: {}", resetLink);
-            return;
-        }
         try {
             Context context = new Context();
             context.setVariable("name", name);
