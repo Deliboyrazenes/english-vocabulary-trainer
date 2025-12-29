@@ -40,7 +40,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                         "/users/login",
-                        "/users/register"
+                        "/users/register",
+                        "/users/verify",
+                        "/users/resend-code",
+                        "/users/forgot-password",
+                        "/users/reset-password"
                 ).permitAll()
                 .anyRequest().authenticated()
                 )
