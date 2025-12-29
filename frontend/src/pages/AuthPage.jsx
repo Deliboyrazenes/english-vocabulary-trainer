@@ -3,7 +3,7 @@ import api from "../services/axios";
 import SkeletonAuth from "../components/Skeleton/SkeletonAuth";
 import toast from "react-hot-toast";
 
-export default function AuthPage({ onLoginSuccess, onBackToHome }) {
+export default function AuthPage({ onLoginSuccess, onRegisterSuccess, onForgotPassword, onBackToHome }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -93,12 +93,8 @@ export default function AuthPage({ onLoginSuccess, onBackToHome }) {
         });
 
         toast.dismiss(loadingToast);
-        toast.success("Kayıt başarılı! Şimdi giriş yapabilirsiniz.");
-        setMessage("✅ Kayıt başarılı! Şimdi giriş yapabilirsiniz.");
-        setIsRegister(false);
-        setEmail("");
-        setPassword("");
-        setName("");
+        toast.success("Kayıt başarılı! Doğrulama kodunuz mail adresinize gönderildi.");
+        onRegisterSuccess(email);
         return;
       }
 
@@ -278,6 +274,13 @@ export default function AuthPage({ onLoginSuccess, onBackToHome }) {
                   <label htmlFor="remember" className="text-white/80">
                     Beni Hatırla
                   </label>
+                  <button
+                    type="button"
+                    onClick={onForgotPassword}
+                    className="ml-auto text-yellow-400 text-sm font-semibold hover:text-yellow-300 transition-colors"
+                  >
+                    Şifremi Unuttum?
+                  </button>
                 </div>
               )}
 
