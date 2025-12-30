@@ -10,7 +10,10 @@ root.render(
   </React.StrictMode>
 );
 
+// Service Worker devre dışı bırakıldı (İnternet erişim hatalarını önlemek için)
+/*
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/service-worker.js");
 }
+*/
 
