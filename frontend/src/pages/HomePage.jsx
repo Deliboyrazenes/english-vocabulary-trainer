@@ -1,4 +1,6 @@
 import React from "react";
+import { motion } from "framer-motion";
+import { BookOpen, Target, Sparkles, PencilLine, BarChart3, ChevronRight } from "lucide-react";
 
 export default function HomePage({ onStart }) {
   const [installPrompt, setInstallPrompt] = React.useState(null);
@@ -105,72 +107,154 @@ export default function HomePage({ onStart }) {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 sm:gap-6 md:gap-7 mb-12 sm:mb-16 md:mb-20 px-2">
-              {[
-                {
-                  emoji: "📘",
-                  title: "5500+ Kelime",
-                  desc: "A1–C1 arası tüm seviyeler tek platformda.",
-                  gradient: "from-purple-500 via-violet-500 to-fuchsia-500",
-                  shadow: "shadow-purple-500/50",
-                },
-                {
-                  emoji: "🎯",
-                  title: "Quiz Modları",
-                  desc: "Yazma, çoktan seçmeli, karışık ve boşluk doldurma.",
-                  gradient: "from-yellow-500 via-amber-500 to-orange-500",
-                  shadow: "shadow-yellow-500/50",
-                },
-                {
-                  emoji: "✨",
-                  title: "AI Cümle Kurma",
-                  desc: "Yapay zeka ile kelimeler için örnek cümleler oluştur.",
-                  gradient: "from-emerald-500 via-teal-500 to-cyan-500",
-                  shadow: "shadow-emerald-500/50",
-                  badge: "YENİ",
-                },
-                {
-                  emoji: "📝",
-                  title: "Kişisel Notlar",
-                  desc: "Her kelimeye istediğin açıklamayı ekle.",
-                  gradient: "from-blue-500 via-cyan-500 to-teal-500",
-                  shadow: "shadow-blue-500/50",
-                },
-                {
-                  emoji: "📊",
-                  title: "İlerleme Raporu",
-                  desc: "Detaylı istatistikler ve öğrenme grafikleri.",
-                  gradient: "from-red-500 via-pink-500 to-rose-500",
-                  shadow: "shadow-red-500/50",
-                },
-              ].map((item, i) => (
-                <div
-                  key={i}
-                  className="group relative bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl sm:rounded-3xl p-6 sm:p-7 md:p-8 hover:bg-white/10 hover:border-white/30 hover:scale-105 hover:-translate-y-2 transition-all duration-300 cursor-pointer overflow-hidden"
+            {/* Ultra-Modern Features Section */}
+            <div className="mb-32 sm:mb-48 relative">
+              {/* background decorative glow */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100%] h-full bg-purple-500/5 blur-[120px] rounded-full"></div>
+
+              <div className="text-center mb-24 relative z-10">
+              {/* Header removed as requested */}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 px-4 max-w-7xl mx-auto relative z-10">
+                {/* 1. Flagship AI Feature */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="md:col-span-8 group relative"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-
-                  {item.badge && (
-                    <div className="absolute top-3 right-3 px-2 py-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-black text-[10px] font-black rounded-full shadow-lg animate-pulse">
-                      {item.badge}
+                  <div className="absolute -inset-px bg-gradient-to-r from-emerald-500/50 to-teal-500/50 rounded-[3rem] opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-500"></div>
+                  <div className="relative h-full bg-[#0f172a]/40 backdrop-blur-3xl border border-white/10 rounded-[3rem] p-10 sm:p-14 overflow-hidden shadow-2xl">
+                    <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_100%_0%,rgb(16_185_129/0.1),transparent_40%)]"></div>
+                    
+                    {/* NEW Badge */}
+                    <div className="absolute top-8 right-10">
+                      <span className="px-3 py-1 bg-emerald-400 text-black text-[10px] font-black rounded-full shadow-lg animate-pulse">
+                        YENİ
+                      </span>
                     </div>
-                  )}
 
-                  <div className="relative">
-                    <div
-                      className={`w-14 h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center text-2xl sm:text-3xl md:text-4xl mb-4 sm:mb-5 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 ${item.shadow} shadow-xl`}
-                    >
-                      {item.emoji}
+                    <div className="flex flex-col h-full">
+                      <div className="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-10 border border-emerald-500/20">
+                        <Sparkles className="w-8 h-8 text-emerald-400" />
+                      </div>
+                      <div className="mt-auto">
+                        <h3 className="text-4xl sm:text-5xl font-black text-white mb-6 leading-none">
+                          AI Cümle <span className="text-emerald-400">Kurma</span>
+                        </h3>
+                        <p className="text-white/50 text-lg md:text-xl leading-relaxed max-w-xl">
+                          Yapay zeka ile kelimeler için anlık ve doğal örnek cümleler oluşturun, bağlamında öğrenin.
+                        </p>
+                      </div>
                     </div>
-                    <h3 className="text-lg sm:text-xl md:text-2xl font-black text-white mb-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-white/80 group-hover:bg-clip-text transition-all">
-                      {item.title}
-                    </h3>
-                    <p className="text-white/60 text-sm sm:text-base leading-relaxed group-hover:text-white/80 transition-colors">
-                      {item.desc}
-                    </p>
                   </div>
-                </div>
-              ))}
+                </motion.div>
+
+                {/* 2. 5500+ Words */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.1 }}
+                  className="md:col-span-4 group relative"
+                >
+                  <div className="absolute -inset-px bg-gradient-to-r from-purple-500/50 to-indigo-500/50 rounded-[3rem] opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-500"></div>
+                  <div className="relative h-full bg-[#0f172a]/40 backdrop-blur-3xl border border-white/10 rounded-[3rem] p-10 flex flex-col justify-between shadow-2xl">
+                    <div className="w-14 h-14 bg-purple-500/10 rounded-2xl flex items-center justify-center border border-purple-500/20">
+                      < BookOpen  className="w-7 h-7 text-purple-400" />
+                    </div>
+                    <div className="mt-8">
+                      <h3 className="text-2xl font-black text-white mb-4">5500+ Kelime</h3>
+                      <p className="text-white/40 text-base leading-relaxed">
+                        A1–C1 arası tüm seviyeler tek platformda. Dev kelime kütüphanesi ile seviyene uygun ilerle.
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Bottom Row - Symmetry */}
+                {[
+                  { 
+                    icon: Target, 
+                    title: "Quiz Modları", 
+                    desc: "Yazma, çoktan seçmeli, karışık ve boşluk doldurma modları.", 
+                    color: "text-yellow-400",
+                    border: "from-yellow-500/50 to-orange-500/50",
+                    bg: "bg-yellow-500/10",
+                    borderColor: "border-yellow-500/20"
+                  },
+                  { 
+                    icon: PencilLine, 
+                    title: "Kelime Notları", 
+                    desc: "Her kelimeye istediğin açıklamayı ekle ve hatırlatıcılar tut.", 
+                    color: "text-blue-400",
+                    border: "from-blue-500/50 to-indigo-500/50",
+                    bg: "bg-blue-500/10",
+                    borderColor: "border-blue-500/20"
+                  },
+                  { 
+                    icon: Sparkles, 
+                    title: "Kişisel Notlar", 
+                    desc: "Kelimelerden bağımsız genel notlarını 'Notlarım' sayfasında yönet.", 
+                    color: "text-emerald-400",
+                    border: "from-emerald-500/50 to-teal-500/50",
+                    bg: "bg-emerald-500/10",
+                    borderColor: "border-emerald-500/20"
+                  },
+                  { 
+                    icon: BarChart3, 
+                    title: "İlerleme Raporu", 
+                    desc: "Detaylı istatistikler ve öğrenme grafikleri ile gelişimini izle.", 
+                    color: "text-red-400",
+                    border: "from-red-500/50 to-pink-500/50",
+                    bg: "bg-red-500/10",
+                    borderColor: "border-red-500/20",
+                    visual: (
+                      <div className="flex items-end gap-3 h-28 md:h-32">
+                        <motion.div initial={{ height: 0 }} whileInView={{ height: '35%' }} className="w-5 bg-red-500/20 rounded-t-md" />
+                        <motion.div initial={{ height: 0 }} whileInView={{ height: '60%' }} className="w-5 bg-red-500/40 rounded-t-md" />
+                        <motion.div initial={{ height: 0 }} whileInView={{ height: '45%' }} className="w-5 bg-red-500/30 rounded-t-md" />
+                        <motion.div initial={{ height: 0 }} whileInView={{ height: '85%' }} className="w-5 bg-red-500/90 rounded-t-md shadow-[0_0_25px_rgba(239,68,68,0.5)]" />
+                        <motion.div initial={{ height: 0 }} whileInView={{ height: '55%' }} className="w-5 bg-red-500/40 rounded-t-md" />
+                        <motion.div initial={{ height: 0 }} whileInView={{ height: '75%' }} className="w-5 bg-red-500/60 rounded-t-md" />
+                        <motion.div initial={{ height: 0 }} whileInView={{ height: '40%' }} className="w-5 bg-red-500/30 rounded-t-md" />
+                      </div>
+                    )
+                  }
+                ].map((item, idx) => (
+                  <motion.div 
+                    key={idx}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.2 + (idx * 0.1) }}
+                    className={`${idx === 3 ? "md:col-span-12" : "md:col-span-4"} group relative`}
+                  >
+                    <div className={`absolute -inset-px bg-gradient-to-r ${item.border} rounded-[3rem] opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-500`}></div>
+                    <div className="relative h-full bg-[#0f172a]/40 backdrop-blur-3xl border border-white/10 rounded-[3rem] p-10 shadow-2xl overflow-hidden">
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 h-full">
+                        <div className="flex flex-col justify-between h-full flex-1">
+                          <div className={`w-14 h-14 ${item.bg} rounded-2xl flex items-center justify-center border ${item.borderColor}`}>
+                            <item.icon className={`w-7 h-7 ${item.color}`} />
+                          </div>
+                          <div className="mt-8">
+                            <h3 className="text-2xl font-black text-white mb-4">{item.title}</h3>
+                            <p className="text-white/40 text-base leading-relaxed max-w-md">
+                              {item.desc}
+                            </p>
+                          </div>
+                        </div>
+                        {item.visual && (
+                          <div className="flex-shrink-0 bg-white/5 p-6 rounded-[2rem] border border-white/5 shadow-inner">
+                            {item.visual}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
             </div>
 
             <div className="max-w-6xl mx-auto mb-12 sm:mb-16 md:mb-20 px-2">
@@ -394,6 +478,14 @@ export default function HomePage({ onStart }) {
           66% {
             transform: translate(-20px, 20px) scale(0.9);
           }
+        }
+        @keyframes animate-shimmer {
+          100% {
+            transform: translateX(100%);
+          }
+        }
+        .animate-shimmer {
+          animation: animate-shimmer 2s infinite;
         }
         .animate-blob {
           animation: blob 7s infinite;

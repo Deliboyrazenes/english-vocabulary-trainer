@@ -187,7 +187,7 @@ export default function AuthPage({ onLoginSuccess, onRegisterSuccess, onForgotPa
             </div>
 
             {/* Form */}
-            <div className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-5">
               {/* Email */}
               <div className="relative">
                 <label className="block text-sm font-bold text-white/90 mb-2">
@@ -287,12 +287,12 @@ export default function AuthPage({ onLoginSuccess, onRegisterSuccess, onForgotPa
 
               {/* Submit */}
               <button
-                onClick={handleSubmit}
+                type="submit"
                 className="w-full py-4 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl text-black font-extrabold text-lg shadow-xl hover:scale-105 transition-all"
               >
                 {isRegister ? "🚀 Hesap Oluştur" : "🎯 Giriş Yap"}
               </button>
-            </div>
+            </form>
 
             {/* Message */}
             {message && (
@@ -320,6 +320,7 @@ export default function AuthPage({ onLoginSuccess, onRegisterSuccess, onForgotPa
                 <>
                   Zaten hesabın var mı?{" "}
                   <button
+                    type="button"
                     onClick={switchMode}
                     className="text-yellow-400 font-bold hover:text-yellow-300"
                   >
@@ -330,6 +331,7 @@ export default function AuthPage({ onLoginSuccess, onRegisterSuccess, onForgotPa
                 <>
                   Hesabın yok mu?{" "}
                   <button
+                    type="button"
                     onClick={switchMode}
                     className="text-yellow-400 font-bold hover:text-yellow-300"
                   >
