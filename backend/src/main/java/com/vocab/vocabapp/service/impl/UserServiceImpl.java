@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
         user.setPasswordResetTokenExpiration(LocalDateTime.now().plusMinutes(15));
         userRepository.save(user);
 
-        String resetLink = frontendUrl + "?token=" + token;
+        String resetLink = (frontendUrl.endsWith("/") ? frontendUrl : frontendUrl + "/") + "?token=" + token;
         
         emailService.sendPasswordResetEmail(user.getEmail(), user.getName(), resetLink);
     }
