@@ -45,7 +45,7 @@ export default function WordListPage({
 
   const [mode, setMode] = useState("en-tr");
   const [shuffled, setShuffled] = useState(false);
-  const [showKnown, setShowKnown] = useState(false);
+  const [viewMode, setViewMode] = useState("learning");
 
   const [showQuizSetup, setShowQuizSetup] = useState(false);
 
@@ -185,19 +185,26 @@ export default function WordListPage({
         w.tr.toLowerCase().includes(filters.search.toLowerCase());
 
       const isKnown = knownWordIds.includes(w.id);
+      const hasNote = !!notes[w.id];
 
-      return (
-        matchLevel &&
-        matchType &&
-        matchSearch &&
-        (showKnown ? isKnown : !isKnown)
-      );
+      // View Mode Logic
+      let matchView = false;
+      if (viewMode === "known") {
+        matchView = isKnown;
+      } else if (viewMode === "with-notes") {
+        matchView = hasNote;
+      } else {
+        // "learning" mode (default) -> Show Unknown words
+        matchView = !isKnown;
+      }
+
+      return matchLevel && matchType && matchSearch && matchView;
     });
 
     if (shuffled) return [...result].sort(() => Math.random() - 0.5);
 
     return result;
-  }, [words, filters, knownWordIds, showKnown, shuffled]);
+  }, [words, filters, knownWordIds, viewMode, notes, shuffled]);
 
   /* ------------------------ QUIZ START ------------------------ */
   const handleStartQuizFromModal = (settings) => {
@@ -334,28 +341,42 @@ export default function WordListPage({
 
           {/* Controls Section */}
           <div className="flex justify-center mb-6 sm:mb-8 gap-2 sm:gap-3 md:gap-4 flex-wrap px-2 sm:px-4">
-            {/* Tabs */}
+            {/* Tabs (View Modes) */}
             <div className="bg-white/5 backdrop-blur-md p-2 rounded-2xl inline-flex border border-white/20 shadow-xl">
+              {/* Learning (Unknown) */}
               <button
-                className={`px-4 md:px-6 py-2 md:py-3 rounded-xl font-bold text-sm md:text-base transition-all ${
-                  !showKnown
+                className={`px-3 md:px-5 py-2 md:py-3 rounded-xl font-bold text-xs md:text-sm transition-all ${
+                  viewMode === "learning"
                     ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-black shadow-lg scale-105"
                     : "text-white hover:bg-white/10"
                 }`}
-                onClick={() => setShowKnown(false)}
+                onClick={() => setViewMode("learning")}
               >
-                📘 Tüm Kelimeler
+                📘 Öğrenilecekler
               </button>
 
+              {/* Known */}
               <button
-                className={`px-4 md:px-6 py-2 md:py-3 rounded-xl font-bold text-sm md:text-base transition-all ${
-                  showKnown
-                    ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-black shadow-lg scale-105"
+                className={`px-3 md:px-5 py-2 md:py-3 rounded-xl font-bold text-xs md:text-sm transition-all ${
+                  viewMode === "known"
+                    ? "bg-gradient-to-r from-emerald-400 to-green-500 text-black shadow-lg scale-105"
                     : "text-white hover:bg-white/10"
                 }`}
-                onClick={() => setShowKnown(true)}
+                onClick={() => setViewMode("known")}
               >
                 ✓ Bildiklerim
+              </button>
+              
+              {/* With Notes (NEW) */}
+              <button
+                className={`px-3 md:px-5 py-2 md:py-3 rounded-xl font-bold text-xs md:text-sm transition-all ${
+                    viewMode === "with-notes"
+                    ? "bg-gradient-to-r from-blue-400 to-indigo-500 text-white shadow-lg scale-105"
+                    : "text-white hover:bg-white/10"
+                }`}
+                onClick={() => setViewMode("with-notes")}
+              >
+                📝 Notlu Kelimeler
               </button>
             </div>
 

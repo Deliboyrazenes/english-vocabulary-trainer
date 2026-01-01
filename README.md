@@ -31,7 +31,7 @@ VocabZone is a modern, full-stack web application designed to help users master 
 ## 📦 Getting Started
 
 ### Prerequisites
-- JDK 17+
+- JDK 21
 - Node.js 18+
 - PostgreSQL Database
 
@@ -45,8 +45,13 @@ VocabZone is a modern, full-stack web application designed to help users master 
 
 2. **Backend Setup:**
    - Navigate to `backend/src/main/resources/`
-   - Copy `application.properties.example` to `application.properties`
-   - Fill in your database and API credentials.
+   - Create `application.properties` and add your credentials:
+     ```properties
+     spring.datasource.url=jdbc:postgresql://localhost:5432/vocabdb
+     spring.datasource.username=your_user
+     spring.datasource.password=your_password
+     # Add other configs (Mail, JWT, Groq) as needed
+     ```
    - Run: `./mvnw spring-boot:run`
 
 3. **Frontend Setup:**
