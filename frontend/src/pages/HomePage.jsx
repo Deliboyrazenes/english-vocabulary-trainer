@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Deliboyraz. All rights reserved.
+ * Licensed under the MIT License.
+ */
 import React from "react";
 import { motion } from "framer-motion";
 import { BookOpen, Target, Sparkles, PencilLine, BarChart3, ChevronRight } from "lucide-react";

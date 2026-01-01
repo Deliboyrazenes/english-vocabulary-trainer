@@ -1,4 +1,8 @@
-import React, { useState } from "react";
+/*
+ * Copyright (c) 2026 Deliboyraz. All rights reserved.
+ * Licensed under the MIT License.
+ */
+import React, { useState, useEffect } from "react";
 
 import { Toaster } from "react-hot-toast";
 import { toastConfig } from "./config/toastConfig";
